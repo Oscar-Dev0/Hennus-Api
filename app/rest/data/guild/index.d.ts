@@ -1,6 +1,6 @@
 import { APIGuild, Snowflake } from "discord-api-types/v10";
 import { GuildBannerFormat, GuildIconFormat, Client } from "../../../core";
-import { BaseData } from "../../";
+import { BaseData } from "../../base/data";
 export declare class Guild extends BaseData {
     private data;
     id: Snowflake;

@@ -1,7 +1,7 @@
 import { APIGuildMember } from "discord-api-types/v10";
-import { BaseData } from "../../base";
 import { Guild } from ".";
 import { Client } from "../../../core";
+import { BaseData } from "../../base/data";
 export declare class GuildMember extends BaseData {
     private dataMember;
     guild: Guild;

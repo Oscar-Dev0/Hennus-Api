@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Guild = void 0;
 const core_1 = require("../../../core");
-const __1 = require("../../");
-class Guild extends __1.BaseData {
+const data_1 = require("../../base/data");
+class Guild extends data_1.BaseData {
     constructor(data, client) {
         super(client);
         this.data = data;

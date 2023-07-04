@@ -17,7 +17,7 @@ export class Client extends BaseClient {
         this.token = options.token || "";
         this.intents = options.intents.reduce((a,b)=>a+b, GatewayIntentBits.MessageContent);
         this.rest = new RestSession(this);
-        this.wss = new WebSession(this);
+        this.wss = new WebSession(this, this.rest.api);
     };
 
     login(){

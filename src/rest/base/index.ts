@@ -2,18 +2,17 @@ import { REST, RequestData } from "@discordjs/rest";
 import { Client, Routes } from "../../core";
 
 
-export class BaseRest extends REST {
+export class BaseRest {
+
+    public api : REST;
 
     constructor(client: Client) {
-      super();
-      super.setToken(client.token);
+        this.api = new REST().setToken(client.token);
     };
 
     async get(link : string, req: RequestData){
         const l = link as `/${string}`;
-        const data = await super.get(l, req);
+        const data = await this.api.get(l, req);
         console.log(data)
     };
 };
-
-export * from "./data";

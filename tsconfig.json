@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        /* Compliter */
+        "module": "ES2020",
+		"target": "ES2020",
+        "strict": true,
+		"lib": ["ESNext", "WebWorker"],
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+        "preserveConstEnums": true,
+		"declaration": true,
+		"declarationDir": "types",
+        "outDir": "app",
+        "rootDir": "src",		
+
+        /* Typing */
+        "noImplicitAny": true,
+		"strictNullChecks": true,
+        "resolveJsonModule": true,
+        "noFallthroughCasesInSwitch": true,
+		"skipLibCheck": true,
+		"strictFunctionTypes": true,
+		"noImplicitThis": true,
+		"noImplicitReturns": true,
+
+    },
+    "exclude": [
+        "node_modules",
+        "app/**",
+        "package.json",
+		"types/**"
+    ],
+    "include": ["**/*"]
+}

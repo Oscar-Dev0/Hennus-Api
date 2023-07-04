@@ -6,7 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 yarn.lock
 app/
-types/
+./types/
 discord/
 lerna-debug.log*
 package-lock.json

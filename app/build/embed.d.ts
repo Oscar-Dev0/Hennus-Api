@@ -1,0 +1,40 @@
+import { APIEmbed } from "discord-api-types/v10";
+export declare class EmbedBuilder {
+    type: string;
+    title: APIEmbed["title"];
+    description: APIEmbed["description"];
+    url: APIEmbed["url"];
+    timestamp: APIEmbed["timestamp"];
+    color: APIEmbed["color"];
+    footer: APIEmbed["footer"];
+    image: APIEmbed["image"];
+    thumbnail: APIEmbed["thumbnail"];
+    author: APIEmbed["author"];
+    fields: APIEmbed["fields"];
+    constructor(options?: APIEmbed);
+    setTitle(value: string): this;
+    setDescription(value: string): this;
+    setURL(url: string): this;
+    setTimeout(time?: Date): this;
+    setColor(color: number | "Red" | "Blue" | "Yellow" | "Orange" | "Green" | "Purple" | "Cyan" | `#${string}`): this;
+    setFooter(option: APIEmbed["footer"]): this;
+    setimage(option: APIEmbed["image"]): this;
+    setThumbnail(option: APIEmbed["thumbnail"] | string): this;
+    setAuthor(option: APIEmbed["author"]): this;
+    setFields(fields: APIEmbed["fields"]): this;
+    addFields(fields: APIEmbed["fields"]): this;
+    addField(name: string, value: string, inline?: boolean): this;
+    private save;
+    get toJson(): {
+        title: string | undefined;
+        description: string | undefined;
+        url: string | undefined;
+        color: number | undefined;
+        author: import("discord-api-types/v10").APIEmbedAuthor | undefined;
+        fields: import("discord-api-types/v10").APIEmbedField[] | undefined;
+        thumbnail: import("discord-api-types/v10").APIEmbedThumbnail | undefined;
+        image: import("discord-api-types/v10").APIEmbedImage | undefined;
+        footer: import("discord-api-types/v10").APIEmbedFooter | undefined;
+        timestamp: string | undefined;
+    };
+}

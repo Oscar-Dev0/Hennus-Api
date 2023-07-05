@@ -1,5 +1,5 @@
 import { REST, RequestData } from "@discordjs/rest";
-import { Client, Routes } from "../../core";
+import { Client } from "../../core";
 
 
 export class BaseRest {

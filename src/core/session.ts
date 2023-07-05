@@ -4,6 +4,7 @@ import { ClientOptions } from "./types";
 
 import { RestSession } from "../rest";
 import { WebSession } from "../wss";
+import { HennusError, errorCodes } from "./Error";
 
 export class Client extends BaseClient {
 
@@ -14,13 +15,24 @@ export class Client extends BaseClient {
 
     constructor(options: ClientOptions) {
         super();
-        this.token = options.token || "";
-        this.intents = options.intents.reduce((a,b)=>a+b, GatewayIntentBits.MessageContent);
-        this.rest = new RestSession(this);
-        this.wss = new WebSession(this, this.rest.api);
+        if (!options.token && options.token.length == 0) throw new HennusError(errorCodes.tokenNull);
+        this.token = options.token;
+        this.intents = options.intents.reduce((a, b) => a + b, GatewayIntentBits.MessageContent);
+        try {
+            this.rest = new RestSession(this);
+            this.wss = new WebSession(this, this.rest.api);
+        } catch {
+            throw new HennusError(errorCodes.tokenInvalid)
+        };
     };
 
-    login(){
-        this.wss.connect();
+    login() {
+        try {
+            this.wss.connect();
+        }
+        catch {
+            throw new HennusError(errorCodes.connectError);
+        };
+
     };
 };

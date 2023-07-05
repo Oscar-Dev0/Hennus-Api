@@ -1,33 +1,38 @@
 {
     "compilerOptions": {
+
         /* Compliter */
         "module": "CommonJS",
-		"target": "ES6",
+        "target": "ES6",
         "strict": true,
-		"lib": ["ESNext", "WebWorker"],
-		"moduleResolution": "node",
-		"esModuleInterop": true,
+        "lib": [
+            "ESNext",
+            "WebWorker"
+        ],
+        "moduleResolution": "node",
+        "esModuleInterop": true,
         "preserveConstEnums": true,
-		"declaration": true,
+        "declaration": true,
         "outDir": "app",
-        "rootDir": "src",		
-
+        "rootDir": "src",
         /* Typing */
         "noImplicitAny": true,
-		"strictNullChecks": true,
+        "strictNullChecks": true,
         "resolveJsonModule": true,
         "noFallthroughCasesInSwitch": true,
-		"skipLibCheck": true,
-		"strictFunctionTypes": true,
-		"noImplicitThis": true,
-		"noImplicitReturns": true,
-
+        "skipLibCheck": true,
+        "strictFunctionTypes": true,
+        "noImplicitThis": true,
+        "noImplicitReturns": true,
+        "strictPropertyInitialization": false
     },
     "exclude": [
         "node_modules",
         "app/**",
         "package.json",
-		"types/**"
+        "types/**"
     ],
-    "include": ["**/*"]
+    "include": [
+        "src/**/*.ts"
+    ],
 }

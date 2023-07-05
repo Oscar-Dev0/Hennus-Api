@@ -1,7 +1,7 @@
 import { APIGuildMember } from "discord-api-types/v10";
-import { Guild } from ".";
-import { Client } from "../../../core";
-import { BaseData } from "../../base/data";
+import { Guild } from "./index";
+import { Client } from "../../core";
+import { BaseData } from "../base/data";
 
 export class GuildMember extends BaseData {
 

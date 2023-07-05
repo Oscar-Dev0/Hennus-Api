@@ -1,11 +1,11 @@
 import { Snowflake } from "discord-api-types/globals";
-import { Guild } from "../../data/guild";
-import { GuildMember } from "../../data/guild/Member";
+import { Guild, GuildMember } from "../../../types";
 
 export interface options {
     guilds: Guild[];
     guild: Guild;
     guildMember: GuildMember;
+    
     
 };
 

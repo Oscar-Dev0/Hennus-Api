@@ -1,6 +1,6 @@
-import { APIGuild, Snowflake } from "discord-api-types/v10";
-import { GuildBannerFormat, GuildIconFormat, RoutesCDN, Client } from "../../../core";
-import { BaseData } from "../../base/data";
+import { APIGuild, CDNRoutes, Snowflake, GuildIconFormat, GuildBannerFormat } from "discord-api-types/v10";
+import { BaseData } from "../base/data";
+import { Client } from "../../core";
 
 
 export class Guild extends BaseData {
@@ -24,12 +24,12 @@ export class Guild extends BaseData {
 
     iconURL(format: GuildIconFormat){
         if(!this.icon) return undefined;
-        return RoutesCDN.guildIcon(this.id, this.icon, format);
+        return CDNRoutes.guildIcon(this.id, this.icon, format);
     };
 
     bannerURL(format: GuildBannerFormat){
         if (!this.banner) return undefined;
-        return RoutesCDN.guildBanner(this.id, this.banner, format);
+        return CDNRoutes.guildBanner(this.id, this.banner, format);
     };
 
     toJson(){
@@ -38,3 +38,5 @@ export class Guild extends BaseData {
     
 
 };
+
+export * from "./Member";

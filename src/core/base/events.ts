@@ -1,3 +1,4 @@
+import { Ready } from "../../types";
 
 export interface ListEvents {
     ApplicationCommandPermissionsUpdate : [],
@@ -38,7 +39,7 @@ export interface ListEvents {
     StageInstanceCreate : [],
     StageInstanceDelete : [],
     StageInstanceUpdate : [],
-    Ready : [],
+    Ready : [ Ready ],
     Resumed : [],
     ThreadCreate : [],
     ThreadDelete : [],
@@ -60,7 +61,11 @@ export interface ListEvents {
     AutoModerationRuleUpdate : [],
     AutoModerationRuleDelete : [],
     AutoModerationActionExecution : [],
-    GuildAuditLogEntryCreate : []
+    GuildAuditLogEntryCreate : [],
+};
+
+export type EventsHandler =  {
+    [K in keyof ListEvents]: (...args: ListEvents[K]) => unknown;
 };
 
 export declare interface EventsString {

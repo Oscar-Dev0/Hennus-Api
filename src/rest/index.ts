@@ -9,5 +9,5 @@ export class RestSession extends BaseRest {
 
 
 export * from "./base";
-export * from "./data";
+export * from "./types";
 export * from "./types";

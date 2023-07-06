@@ -1,4 +1,4 @@
-import { Ready } from "../../types";
+import { Guild, Ready } from "../../types";
 
 export interface ListEvents {
     ApplicationCommandPermissionsUpdate : [],
@@ -8,8 +8,8 @@ export interface ListEvents {
     ChannelUpdate : [],
     GuildBanAdd : [],
     GuildBanRemove : [],
-    GuildCreate : [],
-    GuildDelete : [],
+    GuildCreate : [ Guild ],
+    GuildDelete : [ Guild ],
     GuildEmojisUpdate : [],
     GuildIntegrationsUpdate : [],
     GuildMemberAdd : [],
@@ -20,7 +20,7 @@ export interface ListEvents {
     GuildRoleDelete : [],
     GuildRoleUpdate : [],
     GuildStickersUpdate : [],
-    GuildUpdate : [],
+    GuildUpdate : [ Guild ],
     IntegrationCreate : [],
     IntegrationDelete : [],
     IntegrationUpdate : [],

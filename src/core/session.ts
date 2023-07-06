@@ -29,6 +29,7 @@ export class Client extends BaseClient {
     login() {
         try {
             this.wss.connect();
+            this.wss.handler();
         }
         catch {
             throw new HennusError(errorCodes.connectError);

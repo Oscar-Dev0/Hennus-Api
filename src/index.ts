@@ -1,4 +1,3 @@
-import "module-alias";
 export * from "./wss";
 export * from "./rest";
 export * from "./core";

@@ -1,4 +1,4 @@
-import { REST, RequestData } from "@discordjs/rest";
+import { CDN, REST, RequestData } from "@discordjs/rest";
 import { Client } from "../../core";
 import { GetRoutes, getOptions, getReturn, postOptions, postReturn, postRoutes } from "../types";
 
@@ -6,6 +6,7 @@ import { GetRoutes, getOptions, getReturn, postOptions, postReturn, postRoutes }
 export class BaseRest {
 
     public api : REST;
+    public cdn = new CDN("https://cdn.discordapp.com/");
 
     constructor(client: Client) {
         this.api = new REST().setToken(client.token);

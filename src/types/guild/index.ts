@@ -1,6 +1,7 @@
-import { APIGuild, CDNRoutes, Snowflake, GuildIconFormat, GuildBannerFormat } from "discord-api-types/v10";
+import { APIGuild, Snowflake, GuildIconFormat, GuildBannerFormat } from "discord-api-types/v10";
 import { BaseData } from "../base/data";
 import { Client } from "../../core";
+import { ImageURLOptions } from "@discordjs/rest";
 
 
 export class Guild extends BaseData {
@@ -24,14 +25,14 @@ export class Guild extends BaseData {
         this.countMember = data.approximate_member_count ?? 0;
     };
 
-    iconURL(format: GuildIconFormat){
+    iconURL(options?: ImageURLOptions){
         if(!this.icon) return undefined;
-        return CDNRoutes.guildIcon(this.id, this.icon, format);
+        return this.client.rest.cdn.icon(this.id, this.icon, options);
     };
 
-    bannerURL(format: GuildBannerFormat){
+    bannerURL(options?: ImageURLOptions){
         if (!this.banner) return undefined;
-        return CDNRoutes.guildBanner(this.id, this.banner, format);
+        return this.client.rest.cdn.banner(this.id, this.banner, options);
     };
 
     get memberCount(){

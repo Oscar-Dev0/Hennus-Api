@@ -1,11 +1,11 @@
-import { Guild, Ready } from "../../types";
+import { Channel, Guild, Ready } from "../../types";
 
 export interface ListEvents {
     ApplicationCommandPermissionsUpdate : [],
-    ChannelCreate : [],
-    ChannelDelete : [],
+    ChannelCreate : [ Channel ],
+    ChannelDelete : [ Channel ],
     ChannelPinsUpdate : [],
-    ChannelUpdate : [],
+    ChannelUpdate : [ Channel ],
     GuildBanAdd : [],
     GuildBanRemove : [],
     GuildCreate : [ Guild ],

@@ -27,18 +27,12 @@
   "devDependencies": {
     "typescript": "^5.1.6"
   },
-  "keywords": [
-		"api",
-		"discord",
-		"bots",
-		"typescript",
-		"botdev"
-	],
+  "keywords": [ "api", "discord", "bots", "typescript", "botdev" ],
   "repository": {
-		"type": "git",
-		"url": "git+https://github.com/Oscar-Dev0/Hennus-Api.git"
-	},
+    "type": "git",
+    "url": "git+https://github.com/Oscar-Dev0/Hennus-Api.git"
+  },
   "bugs": {
-		"url": "https://github.com/Oscar-Dev0/Hennus-Api"
-	}
+    "url": "https://github.com/Oscar-Dev0/Hennus-Api"
+  }
 }

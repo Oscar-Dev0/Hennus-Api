@@ -12,8 +12,8 @@ export class BaseClient extends EventEmitter2 {
     id: Snowflake;
     user: User;
     aplicationId: Snowflake;
-    guilds: Collection<string, Guild>;
-    channels: Collection<string, Channel>;
+    guilds = new Collection<string, Guild>();
+    channels = new Collection<string, Channel>();
 
     // Aca vamos a ponerle el type a los eventos.
 

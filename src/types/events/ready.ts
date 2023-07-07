@@ -4,20 +4,21 @@ import { Client } from "../../core";
 
 export class Ready {
 
-    private data : GatewayReadyDispatchData
+    private data : GatewayReadyDispatchData;
+    public readonly client!: Client;
 
     constructor(data: GatewayReadyDispatchData, client: Client){
         Object.defineProperty(this, "data", {
             value: data
         });
-
-        if(!client.id) client.setUser(this.user);
-        if(!client.aplicationId) client.setAplication(data.application.id);
-
+        Object.defineProperty(this, "client",{
+            value: client
+        })
+        
     };
 
     get user(){
-        return new User(this.data.user);
+        return new User(this.data.user, this.client);
     };
 
     get aplication(){

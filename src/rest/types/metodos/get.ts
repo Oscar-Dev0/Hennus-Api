@@ -1,9 +1,9 @@
 import { Snowflake } from "discord-api-types/globals";
-import { APIGuild, APIGuildMember, APIMessage, Routes } from "discord-api-types/v10";
+import { APIGuild, APIGuildMember, APIMessage, RESTPatchAPIGuildJSONBody, Routes } from "discord-api-types/v10";
 import { Guild, Message } from "../../../types";
 
 export interface getReturn {
-    userGuilds: APIGuild[];
+    userGuilds: Pick<APIGuild, "owner" | "name" | "id" | "icon" | "permissions" | "features">[];
     guild: APIGuild;
     guildMember: APIGuildMember;
     guildMembers: APIGuildMember[];
@@ -37,6 +37,7 @@ interface type<T extends keyof getOptions> {
 export function GetRoutes<T extends keyof getOptions, D extends type<T>>( type: D["op"], ...args: D["d"] ): D["link"] {
     Routes.channelMessages
     const router = Routes[type];
+    console.log(router)
     //@ts-ignore
     return router(...args) as D["link"];
 
@@ -44,7 +45,7 @@ export function GetRoutes<T extends keyof getOptions, D extends type<T>>( type: 
 
 
 export interface getNode {
-    userGuilds:{ return: Guild[], data: getOptions["userGuilds"] };
+    userGuilds:{ return: Pick<APIGuild, "owner" | "name" | "id" | "icon" | "permissions" | "features"> [], data: getOptions["userGuilds"] };
     guild: { return: Guild, data: getOptions['guild'] };
     guildMember: { return: APIGuildMember, data: getOptions['guildMember'] };
     guildMembers: { return: APIGuildMember[], data: getOptions['guildMembers']};

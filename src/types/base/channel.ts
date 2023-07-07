@@ -40,5 +40,10 @@ export class BaseChannel {
         if(this.data.type == ChannelType.GuildAnnouncement || this.data.type == ChannelType.GuildText)return true;
         return false;
     };
+
+    isChannelMd(){
+        if(this.data.type == ChannelType.DM || this.data.type == ChannelType.GroupDM) return true;
+        return false;
+    };
     
 };

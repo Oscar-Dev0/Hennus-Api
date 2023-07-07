@@ -6,6 +6,7 @@ import { Client } from "../../core";
 export class Guild extends BaseData {
 
     private data : APIGuild;
+    private countMember: number = 0;
     id: Snowflake;
     name: string;
     description: string | null;
@@ -20,6 +21,7 @@ export class Guild extends BaseData {
         this.description = data.description;
         this.icon = data.icon;
         this.banner = data.banner;
+        this.countMember = data.approximate_member_count ?? 0;
     };
 
     iconURL(format: GuildIconFormat){
@@ -32,8 +34,17 @@ export class Guild extends BaseData {
         return CDNRoutes.guildBanner(this.id, this.banner, format);
     };
 
+    get memberCount(){
+        const count = this.countMember;
+        return count;
+    };
+
     toJson(){
         return this.data;
+    };
+
+    setMemberCount(num: number){
+        this.countMember = num;
     };
     
 

@@ -1,6 +1,6 @@
 import EventEmitter2  from "eventemitter2";
 import { EventsHandler, ListEvents } from "./events";
-import { User, Guild } from "../../types";
+import { User, Guild, Channel } from "../../types";
 import { Snowflake } from "discord-api-types/globals";
 import { Collection } from "@discordjs/collection";
 
@@ -13,6 +13,7 @@ export class BaseClient extends EventEmitter2 {
     user: User;
     aplicationId: Snowflake;
     guilds: Collection<string, Guild>;
+    channels: Collection<string, Channel>;
 
     // Aca vamos a ponerle el type a los eventos.
 

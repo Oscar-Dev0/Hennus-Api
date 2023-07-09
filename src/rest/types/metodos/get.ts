@@ -1,9 +1,10 @@
 import { Snowflake } from "discord-api-types/globals";
-import { APIGuild, APIGuildMember, APIMessage, RESTPatchAPIGuildJSONBody, Routes } from "discord-api-types/v10";
-import { Guild, Message } from "../../../types";
+import { APIChannel, APIGuild, APIGuildMember, APIMessage, RESTPatchAPIGuildJSONBody, Routes } from "discord-api-types/v10";
+import { Channel, Guild, Message } from "../../../types";
 
 export interface getReturn {
     userGuilds: Pick<APIGuild, "owner" | "name" | "id" | "icon" | "permissions" | "features">[];
+    guildChannels: APIChannel[];
     guild: APIGuild;
     guildMember: APIGuildMember;
     guildMembers: APIGuildMember[];
@@ -12,6 +13,7 @@ export interface getReturn {
 
 export interface getOptions {
     userGuilds: [];
+    guildChannels: [ guildId: string ];
     guild: [id: Snowflake];
     guildMember: [guildId: Snowflake, memberId: Snowflake];
     guildMembers: [ guildId: Snowflake ];
@@ -20,6 +22,7 @@ export interface getOptions {
 
 interface getLink {
     userGuilds: `/users/@me/guilds`;
+    guildChannels: `/guilds/${string}/channel`;
     guild: `/guilds/${string}`;
     guildMember: `/guilds/${string}/members/${string}`;
     guildMembers: `/guilds/${string}/members`;
@@ -35,7 +38,7 @@ interface type<T extends keyof getOptions> {
 };
 
 export function GetRoutes<T extends keyof getOptions, D extends type<T>>( type: D["op"], ...args: D["d"] ): D["link"] {
-    Routes.channelMessages
+    Routes.guildChannels
     const router = Routes[type];
     //@ts-ignore
     return router(...args) as D["link"];
@@ -45,6 +48,7 @@ export function GetRoutes<T extends keyof getOptions, D extends type<T>>( type: 
 
 export interface getNode {
     userGuilds:{ return: Pick<APIGuild, "owner" | "name" | "id" | "icon" | "permissions" | "features"> [], data: getOptions["userGuilds"] };
+    guildChannels: {return: Channel[], data: getOptions['guildChannels'] };
     guild: { return: Guild, data: getOptions['guild'] };
     guildMember: { return: APIGuildMember, data: getOptions['guildMember'] };
     guildMembers: { return: APIGuildMember[], data: getOptions['guildMembers']};

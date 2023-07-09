@@ -2,9 +2,11 @@ import { APIGuildStageVoiceChannel, APIGuildVoiceChannel } from "discord-api-typ
 import { BaseChannel } from "../base/channel";
 import { Client } from "../../core";
 import { Guild } from "../guild";
+import { MessagesCollection } from "../../utils";
 
 export class BasedVoiceChannel extends BaseChannel {
-    
+
+    private _cache_messages = new MessagesCollection();
     private voice: APIGuildVoiceChannel | APIGuildStageVoiceChannel;
     public guildId: string;
     public guild: Guild;
@@ -28,6 +30,10 @@ export class BasedVoiceChannel extends BaseChannel {
         return this.voice.bitrate || 0;
     };
 
+    get messages(){
+        return this._cache_messages.restSet(this.client.rest, this.id);
+    };
+    
     get nsfw(){
         return this.voice.nsfw ?? false;
     };

@@ -11,19 +11,3 @@ export interface MessageCreateOptions {
 };
 
 export type MessageCreateData = MessageCreateOptions | string;
-
-export class Message {
-    private data: APIMessage;
-
-    constructor(data: APIMessage){
-        this.data = data;
-    };
-
-    get id(){
-        return this.data.id;
-    };
-
-    get toJson(){
-        return this.data
-    };
-};

@@ -5,11 +5,13 @@ import { ClientOptions } from "./types";
 import { RestSession } from "../rest";
 import { WebSession } from "../wss";
 import { HennusError, errorCodes } from "./Error";
+import { WebSocketShardEvents } from "@discordjs/ws";
+import { IntentsBitField } from "../types/bitfield/intentsbitfield";
 
 export class Client extends BaseClient {
 
     token: string;
-    intents: GatewayIntentBits;
+    intents = new IntentsBitField();
     rest: RestSession;
     wss: WebSession;
 
@@ -17,19 +19,23 @@ export class Client extends BaseClient {
         super();
         if (!options.token && options.token.length == 0) throw new HennusError(errorCodes.tokenNull);
         this.token = options.token;
-        this.intents = options.intents.reduce((a, b) => a + b, GatewayIntentBits.MessageContent);
-        try {
-            this.rest = new RestSession(this);
-            this.wss = new WebSession(this, this.rest.api);
-        } catch {
-            throw new HennusError(errorCodes.tokenInvalid)
+        if (options.intents === undefined) {
+            this.intents.add(0 as GatewayIntentBits);
+        } else {
+            if (Array.isArray(options.intents)) this.intents.add(...options.intents);
+            else this.intents.add(options.intents);
         };
+        
+        this.wss = new WebSession(this, this.rest.api);
+        this.rest = new RestSession(this);
+
     };
 
-    login() {
+    async login() {
+
         try {
-            this.wss.connect();
-            this.wss.handler();
+            await this.wss.connect();
+            this.wss.on(WebSocketShardEvents.Dispatch, ({ data }) => this.wss.Handler(data));
         }
         catch {
             throw new HennusError(errorCodes.connectError);

@@ -9,8 +9,13 @@ export class HennusError extends Error {
 
 export enum errorCodes {
 
+    /* Tokens */
     tokenInvalid = "Token es invalido.",
     tokenNull = "Token no proporcionado.",
 
-    connectError = "No se pudo conectar."
+    /* Conection */ 
+    connectError = "No se pudo conectar.",
+
+    /* Bits */
+    bitsError = "No es una bitField valida.",
 }

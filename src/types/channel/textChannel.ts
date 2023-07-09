@@ -1,14 +1,14 @@
 import { APINewsChannel, APITextChannel,  } from "discord-api-types/v10";
 import { BaseChannel } from "../base/channel";
-import { Message, MessageCreateData, MessageCreateOptions } from "../message";
 import { Client } from "../../core";
 import { Collection } from "@discordjs/collection";
 import { Guild } from "../guild";
+import { Message } from "../events";
+import { MessagesCollection } from "../../utils";
 
 export class BasedTextChannel extends BaseChannel {
     
-    private _cache_messages = new Collection<string, Message>();
-    private _count_Message: number;
+    private _cache_messages = new MessagesCollection();
     private msg: APITextChannel | APINewsChannel;
     public guildId: string;
     public guild: Guild;
@@ -29,14 +29,7 @@ export class BasedTextChannel extends BaseChannel {
     };
 
     get messages(){
-        if(!this._count_Message){
-            this.client.rest.get("channelMessages", this.id).then((x)=>{
-                if(!x) return;
-                this._count_Message = x.length;
-                x.forEach((msg)=>this._cache_messages.set(msg.id, msg));
-            });
-        };
-        return this._cache_messages;
+        return this._cache_messages.restSet(this.client.rest, this.id);
     };
 
     get nsfw(){

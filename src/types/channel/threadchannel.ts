@@ -2,9 +2,11 @@ import { APIThreadChannel } from "discord-api-types/v10";
 import { BaseChannel } from "../base/channel";
 import { Client } from "../../core";
 import { Guild } from "../guild";
+import { MessagesCollection } from "../../utils";
 
 export class BasedThreadChannel extends BaseChannel {
     
+    private _cache_messages = new MessagesCollection();
     private thread: APIThreadChannel;
     public lastPin: string;
     public lastMessage: string;
@@ -28,6 +30,10 @@ export class BasedThreadChannel extends BaseChannel {
         return this.thread.nsfw ?? false;
     };
 
+    get messages(){
+        return this._cache_messages.restSet(this.client.rest, this.id);
+    };
+    
     get permission(){
         return this.thread.permission_overwrites ?? [];
     };

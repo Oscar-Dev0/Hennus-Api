@@ -2,12 +2,14 @@ import { APIGuild, Snowflake, GuildIconFormat, GuildBannerFormat } from "discord
 import { BaseData } from "../base/data";
 import { Client } from "../../core";
 import { ImageURLOptions } from "@discordjs/rest";
+import { Channels } from "../../utils";
 
 
 export class Guild extends BaseData {
 
     private data : APIGuild;
     private countMember: number = 0;
+    public channels = new Channels();
     id: Snowflake;
     name: string;
     description: string | null;

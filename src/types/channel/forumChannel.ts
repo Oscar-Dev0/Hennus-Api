@@ -2,9 +2,11 @@ import { APIGuildForumChannel } from "discord-api-types/v10";
 import { BaseChannel } from "../base/channel";
 import { Client } from "../../core";
 import { Guild } from "../guild";
+import { MessagesCollection } from "../../utils";
 
 export class BasedForumChannel extends BaseChannel {
 
+    private _cache_messages = new MessagesCollection();
     private forum: APIGuildForumChannel;
     public lastPin: string;
     public lastMessage: string;
@@ -24,8 +26,10 @@ export class BasedForumChannel extends BaseChannel {
         const guild = client.guilds.get(this.guildId);
         if(guild) this.guild = guild;
 
-        
+    };
 
+    get messages(){
+        return this._cache_messages.restSet(this.client.rest, this.id);
     };
 
    get topic(){

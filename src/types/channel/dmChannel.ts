@@ -3,8 +3,10 @@ import { BaseChannel } from "../base/channel";
 import { User } from "../user";
 import { CDN, BaseImageURLOptions } from "@discordjs/rest";
 import { Client } from "../../core";
+import { MessagesCollection } from "../../utils";
 
 export class BasedDmChannel extends BaseChannel {
+    private _cache_messages = new MessagesCollection();
     private dm?: APIDMChannel;
     private dmGroup?: APIGroupDMChannel;
     public lastPin: string;
@@ -29,6 +31,10 @@ export class BasedDmChannel extends BaseChannel {
         if( data.msg ) this.lastMessage = data.msg;
         if( data.pin  && !isNaN(+new Date(data.pin)) ) this.lastPin = data.pin;
         return this;
+    };
+
+    get messages(){
+        return this._cache_messages.restSet(this.client.rest, this.id);
     };
 
     iconURL(options?: BaseImageURLOptions){

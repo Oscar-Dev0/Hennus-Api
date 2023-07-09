@@ -1,8 +1,9 @@
 import EventEmitter2  from "eventemitter2";
 import { EventsHandler, ListEvents } from "./events";
-import { User, Guild, Channel } from "../../types";
+import { User, Guild } from "../../types";
 import { Snowflake } from "discord-api-types/globals";
 import { Collection } from "@discordjs/collection";
+import { Channels } from "../../utils";
 
 export class BaseClient extends EventEmitter2 { 
 
@@ -13,7 +14,7 @@ export class BaseClient extends EventEmitter2 {
     user: User;
     aplicationId: Snowflake;
     guilds = new Collection<string, Guild>();
-    channels = new Collection<string, Channel>();
+    channels = new Channels();
 
     // Aca vamos a ponerle el type a los eventos.
 
@@ -25,7 +26,7 @@ export class BaseClient extends EventEmitter2 {
 
     override emit<T extends keyof ListEvents>(event: T, ...args: ListEvents[T]): boolean;
     override emit<T extends string>(event: T, ...args: any[]){
-        return super.emit(event, args);
+        return super.emit(event, ...args);
     };
      
     constructor(){

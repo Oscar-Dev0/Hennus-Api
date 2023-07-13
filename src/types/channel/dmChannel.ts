@@ -3,48 +3,50 @@ import { BaseChannel } from "../base/channel";
 import { User } from "../user";
 import { CDN, BaseImageURLOptions } from "@discordjs/rest";
 import { Client } from "../../core";
-import { MessagesCollection } from "../../utils";
+import { MessagesManager } from "../../utils";
+import { channelFlags } from "../bitfield";
 
 export class BasedDmChannel extends BaseChannel {
-    private _cache_messages = new MessagesCollection();
+    private _cache_messages = new MessagesManager(this.client);
     private dm?: APIDMChannel;
     private dmGroup?: APIGroupDMChannel;
-    public lastPin: string;
-    public lastMessage: string;
 
 
-    constructor(data: APIDMChannel | APIGroupDMChannel, client: Client) {
+
+    constructor(private data: APIDMChannel | APIGroupDMChannel, client: Client) {
         super(data, client)
-        if( data.last_pin_timestamp ) this.lastPin = data.last_pin_timestamp;
-        if( data.last_message_id ) this.lastMessage = data.last_message_id;
-        if(data.type == ChannelType.DM) this.dm = data;
-        else if (data.type === ChannelType.GroupDM ) this.dmGroup = data ;
+        Object.defineProperty(this, "data", { value: data })
+        if(this.data.type == ChannelType.DM) this.dm = this.data;
+        else if (this.data.type === ChannelType.GroupDM ) this.dmGroup = this.data ;
     };
 
-    get users(){
-        if(this.dm) return this.dm.recipients?.map((x)=> new User(x, this.client));
-        if(this.dmGroup) return this.dmGroup.recipients?.map((x)=> new User(x, this.client));
-        return undefined;
-    };
-
-    setLast(data: { pin?: string, msg?: string }){
-        if( data.msg ) this.lastMessage = data.msg;
-        if( data.pin  && !isNaN(+new Date(data.pin)) ) this.lastPin = data.pin;
-        return this;
-    };
+    public lastMessage = this.data.last_message_id ?? undefined;
+    public lastPin = this.data.last_pin_timestamp ?? undefined;
+    public users = this.data.recipients ? this.data.recipients.map((x)=> new User(x, this.client)) : undefined;
 
     get messages(){
-        return this._cache_messages.restSet(this.client.rest, this.id);
+        this._cache_messages.fetchall(this.id);
+        return this._cache_messages;
     };
 
     iconURL(options?: BaseImageURLOptions){
         if(!this.dmGroup || !this.dmGroup?.icon) return undefined;
-        else return new CDN().channelIcon(this.id, this.dmGroup.icon, options);
+        else return this.cdn.channelIcon(this.id, this.dmGroup.icon, options);
     };
 
     toJson(){
-        if(this.dm) return {...this.dm, type: "dm"};
-        if(this.dmGroup) return { ...this.dmGroup, type: "dmgroup" };
-        return undefined;
+        return {...this.data};
+    };
+
+    private _patch(data: APIDMChannel | APIGroupDMChannel){
+        if(data.type == ChannelType.DM) this.dm = data;
+        else if (data.type === ChannelType.GroupDM ) this.dmGroup = data;
+        if(data.name !== this.data.name) this.name = data.name ?? "";
+        if(data.flags !== this.data.flags) this.flags = new channelFlags(data.flags).freeze();
+        if(data.last_message_id !== this.data.last_message_id) this.lastMessage = data.last_message_id ?? undefined;
+        if(data.last_pin_timestamp !== this.data.last_pin_timestamp) this.lastPin = data.last_pin_timestamp ?? undefined;
+        if(Array.isArray(data.recipients)) this.users = data.recipients ? data.recipients.map((x)=> new User(x, this.client)) : undefined;
+        this.data = data;
+        return this;   
     };
 };

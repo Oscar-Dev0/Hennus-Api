@@ -1,10 +1,16 @@
 import { Client } from "../../core";
 
 export class BaseData {
-    public client: Client;
+    constructor( public readonly client: Client){
+        Object.defineProperty(this, "client", { value: client } );
+    };
 
-    constructor(client: Client){
-        this.client = client;
+    get cdn(){
+        return this.client.rest.cdn;
+    };
+
+    get rest(){
+        return this.client.rest;
     };
     
 };

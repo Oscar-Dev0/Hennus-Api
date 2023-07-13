@@ -12,9 +12,11 @@
         "moduleResolution": "node",
         "esModuleInterop": true,
         "preserveConstEnums": true,
+        "removeComments": true,
         "declaration": true,
         "outDir": "app",
         "rootDir": "src",
+
         /* Typing */
         "noImplicitAny": true,
         "strictNullChecks": true,

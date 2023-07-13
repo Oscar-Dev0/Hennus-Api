@@ -1,6 +1,6 @@
 {
   "name": "hennus-api",
-  "version": "0.0.8-Demo",
+  "version": "0.0.9-Demo",
   "description": "Esta es una libreria para el bot Hennus",
   "main": "app/index.js",
   "types": "app/index.d.ts",
@@ -21,13 +21,19 @@
     "@discordjs/collection": "^1.5.1",
     "@discordjs/rest": "^1.7.1",
     "@discordjs/ws": "^0.8.3",
-    "discord-api-types": "^0.37.47",
+    "discord-api-types": "^0.37.48",
     "eventemitter2": "^6.4.9"
   },
   "devDependencies": {
     "typescript": "^5.1.6"
   },
-  "keywords": [ "api", "discord", "bots", "typescript", "botdev" ],
+  "keywords": [
+    "api",
+    "discord",
+    "bots",
+    "typescript",
+    "botdev"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Oscar-Dev0/Hennus-Api.git"

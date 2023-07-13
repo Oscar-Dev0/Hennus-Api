@@ -2,57 +2,47 @@ import { APIThreadChannel } from "discord-api-types/v10";
 import { BaseChannel } from "../base/channel";
 import { Client } from "../../core";
 import { Guild } from "../guild";
-import { MessagesCollection } from "../../utils";
+import { MessagesManager } from "../../utils";
+import { channelFlags, OverwriteBitField } from "../bitfield";
 
 export class BasedThreadChannel extends BaseChannel {
-    
-    private _cache_messages = new MessagesCollection();
-    private thread: APIThreadChannel;
-    public lastPin: string;
-    public lastMessage: string;
-    public guildId: string;
-    public guild: Guild;
-
-    constructor(data: APIThreadChannel, client: Client){
+    constructor(private data: APIThreadChannel, client: Client){
         super(data, client);
-        this.thread = data;
+        Object.defineProperty(this, "data", { value: data });
 
-        if(data.last_pin_timestamp) this.lastPin = data.last_pin_timestamp;
-        if(data.last_message_id)this.lastMessage = data.last_message_id; 
-
-        if(data.guild_id) this.guildId = data.guild_id;
-
-        const guild = client.guilds.get(this.guildId);
+        const guild = client.guilds.cache.get(this.guildId);
         if(guild) this.guild = guild;
     };
 
-    get nsfw(){
-        return this.thread.nsfw ?? false;
-    };
+    public nsfw = this.data.nsfw ?? false;
+    public permission = (this.data.permission_overwrites ?? []).map(({id, type, deny, allow})=> { return{ id, type, deny: new OverwriteBitField(Number(deny) ), allow:  new OverwriteBitField(Number(allow))} } );
+    public position = this.data.position;
+    public parent = this.data.parent_id ?? undefined;
+    public lastPin: string = this.data.last_pin_timestamp ?? "";
+    public lastMessage: string = this.data.last_message_id ?? "";
+    public guildId: string = this.data.guild_id ?? "";
+    private _cache_messages = new MessagesManager(this.client);
+    public guild: Guild;
 
     get messages(){
-        return this._cache_messages.restSet(this.client.rest, this.id);
-    };
-    
-    get permission(){
-        return this.thread.permission_overwrites ?? [];
+        this._cache_messages.fetchall(this.id);
+        return this._cache_messages;
     };
 
-    get position(){
-        return this.thread.position;
+    toJson(){
+        return this.data;
     };
 
-    get parent(){
-        return this.thread.parent_id;
-    };
-
-    get toJson(){
-        return this.thread;
-    };
-
-    setLast(data: { pin?: string, msg?: string }){
-        if( data.msg ) this.lastMessage = data.msg;
-        if( data.pin  && !isNaN(+new Date(data.pin)) ) this.lastPin = data.pin;
+    private _patch(data: APIThreadChannel){
+        if (this.name != this.data.name) this.name = data.name;
+        if (this.data.flags != data.flags ?? 0) this.flags = new channelFlags(data.flags).freeze();
+        if (this.data.nsfw !== data.nsfw) this.nsfw = data.nsfw ?? false;
+        if (this.data.permission_overwrites !== data.permission_overwrites) this.permission = (data.permission_overwrites ?? []).map(({ id, type, deny, allow }) => ({ id, type, deny: new OverwriteBitField(Number(deny)), allow: new OverwriteBitField(Number(allow)) }));
+        if (this.data.position !== data.position) this.position = data.position;
+        if (this.data?.parent_id !== data.parent_id) this.parent = data.parent_id ?? undefined;
+        if (this.data?.guild_id !== data.guild_id) this.guildId = data.guild_id ?? "";
+        
+        this.data = data;
         return this;
     };
 

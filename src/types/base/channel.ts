@@ -3,15 +3,61 @@ import { DiscordSnowflake } from "@sapphire/snowflake"
 import { BasedCategoryChannel, BasedDmChannel, BasedForumChannel, BasedTextChannel, BasedThreadChannel, BasedVoiceChannel } from "../channel";
 import { Client } from "../../core";
 import { MessageCreateData, MessageCreateOptions } from "../message";
+import { BaseData } from "./data";
+import { channelFlags } from "../bitfield";
 
-export class BaseChannel {
+export class BaseChannel extends BaseData {
+    constructor(private _data: APIChannel, client: Client) {
+        super(client);
+        Object.defineProperty(this, "_data", { value: _data });
+    };
 
-    private data: APIChannel;
-    public client: Client;
 
-    constructor(data: APIChannel, client: Client) {
-        this.data = data;
-        this.client = client;
+    public id = this._data.id;
+    public name = this._data.name ?? "";
+    public flags = new channelFlags(this._data.flags).freeze();
+    public type = this._data.type;
+
+    get createdTimestamp() {
+        return DiscordSnowflake.timestampFrom(this.id);
+    };
+
+    get createdAt() {
+        return new Date(this.createdTimestamp);
+    };
+
+    async delete(){
+        return await this.client.rest;
+    }
+
+    isChannelText(): this is BasedTextChannel{
+        if(this.type == ChannelType.GuildAnnouncement || this.type == ChannelType.GuildText)return true;
+        return false;
+    };
+
+    isChannelDm(): this is BasedDmChannel{
+        if(this.type == ChannelType.DM || this.type == ChannelType.GroupDM) return true;
+        return false;
+    };
+
+    isChannelVoice(): this is BasedVoiceChannel {
+        if(this.type == ChannelType.GuildVoice || this.type == ChannelType.GuildStageVoice) return true;
+        return false;
+    };
+
+    isChannelCategory(): this is BasedCategoryChannel {
+        if(this.type == ChannelType.GuildCategory) return true;
+        return false;
+    };
+
+    isChannelForum(): this is BasedForumChannel {
+        if(this.type == ChannelType.GuildForum) return true;
+        return false;
+    };
+
+    isChannelthread(): this is BasedThreadChannel {
+        if(this.type == ChannelType.PublicThread || this.type == ChannelType.PrivateThread || this.type == ChannelType.AnnouncementThread) return true;
+        return false;
     };
 
     async send(options: MessageCreateData){
@@ -36,64 +82,4 @@ export class BaseChannel {
         return await this.client.rest.post("channelMessages", mData, this.id)
     };
 
-    get id() {
-        return this.data.id;
-    };
-
-    get name() {
-        const name = this.data.name;
-        if (!name) return undefined;
-        return name;
-    };
-
-    get flags() {
-        return this.data.flags;
-    };
-
-    get type() {
-        return this.data.type;
-    };
-
-    get createdTimestamp() {
-        return DiscordSnowflake.timestampFrom(this.id);
-    };
-
-    get createdAt() {
-        return new Date(this.createdTimestamp);
-    };
-
-    async delete(){
-        return await this.client.rest;
-    }
-
-    isChannelText(): this is BasedTextChannel{
-        if(this.data.type == ChannelType.GuildAnnouncement || this.data.type == ChannelType.GuildText)return true;
-        return false;
-    };
-
-    isChannelDm(): this is BasedDmChannel{
-        if(this.data.type == ChannelType.DM || this.data.type == ChannelType.GroupDM) return true;
-        return false;
-    };
-
-    isChannelVoice(): this is BasedVoiceChannel {
-        if(this.data.type == ChannelType.GuildVoice || this.data.type == ChannelType.GuildStageVoice) return true;
-        return false;
-    };
-
-    isChannelCategory(): this is BasedCategoryChannel {
-        if(this.data.type == ChannelType.GuildCategory) return true;
-        return false;
-    };
-
-    isChannelForum(): this is BasedForumChannel {
-        if(this.data.type == ChannelType.GuildForum) return true;
-        return false;
-    };
-
-    isChannelthread(): this is BasedThreadChannel {
-        if(this.data.type == ChannelType.PublicThread || this.data.type == ChannelType.PrivateThread || this.data.type == ChannelType.AnnouncementThread) return true;
-        return false;
-    };
-    
 };

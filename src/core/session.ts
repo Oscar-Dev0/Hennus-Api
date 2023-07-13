@@ -1,19 +1,13 @@
-import { GatewayIntentBits } from "discord-api-types/v10";
+import { GatewayIntentBits, GatewayOpcodes } from "discord-api-types/v10";
 import { BaseClient } from "./base";
 import { ClientOptions } from "./types";
-
 import { RestSession } from "../rest";
 import { WebSession } from "../wss";
 import { HennusError, errorCodes } from "./Error";
 import { WebSocketShardEvents } from "@discordjs/ws";
-import { IntentsBitField } from "../types/bitfield/intentsbitfield";
+import { ChannelsManager, GuildsManager, UsersManager } from "../utils";
 
 export class Client extends BaseClient {
-
-    token: string;
-    intents = new IntentsBitField();
-    rest: RestSession;
-    wss: WebSession;
 
     constructor(options: ClientOptions) {
         super();
@@ -25,9 +19,11 @@ export class Client extends BaseClient {
             if (Array.isArray(options.intents)) this.intents.add(...options.intents);
             else this.intents.add(options.intents);
         };
-        
-        this.wss = new WebSession(this, this.rest.api);
         this.rest = new RestSession(this);
+        this.wss = new WebSession(this, this.rest.api);
+        this.channels = new ChannelsManager(this);
+        this.users = new UsersManager(this);
+        this.guilds = new GuildsManager(this);
 
     };
 
@@ -36,6 +32,8 @@ export class Client extends BaseClient {
         try {
             await this.wss.connect();
             this.wss.on(WebSocketShardEvents.Dispatch, ({ data }) => this.wss.Handler(data));
+            this.wss.on(WebSocketShardEvents.Ready, ({data})=> this.wss.ready(data));
+            //this.wss.send(0, { op: GatewayOpcodes.RequestGuildMembers, d: { guild_id: "", query: "", limit: 0 } })
         }
         catch {
             throw new HennusError(errorCodes.connectError);

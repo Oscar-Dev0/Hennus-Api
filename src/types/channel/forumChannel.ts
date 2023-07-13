@@ -2,62 +2,54 @@ import { APIGuildForumChannel } from "discord-api-types/v10";
 import { BaseChannel } from "../base/channel";
 import { Client } from "../../core";
 import { Guild } from "../guild";
-import { MessagesCollection } from "../../utils";
+import { MessagesManager } from "../../utils";
+import { channelFlags, OverwriteBitField } from "../bitfield";
 
 export class BasedForumChannel extends BaseChannel {
 
-    private _cache_messages = new MessagesCollection();
-    private forum: APIGuildForumChannel;
-    public lastPin: string;
-    public lastMessage: string;
-    public guildId: string;
-    public guild: Guild;
-
-
-    constructor(data: APIGuildForumChannel, client: Client){
+    constructor(private data: APIGuildForumChannel, client: Client) {
         super(data, client);
-        this.forum = data;
 
-        if(data.last_pin_timestamp) this.lastPin = data.last_pin_timestamp;
-        if(data.last_message_id)this.lastMessage = data.last_message_id; 
+        Object.defineProperty(this, "data", { value: data });
 
-        if(data.guild_id) this.guildId = data.guild_id;
-
-        const guild = client.guilds.get(this.guildId);
-        if(guild) this.guild = guild;
-
+        const guild = client.guilds.cache.get(this.guildId);
+        if (guild) this.guild = guild;
     };
 
-    get messages(){
-        return this._cache_messages.restSet(this.client.rest, this.id);
+    public topic = this.data?.topic ?? "";
+    public nsfw = this.data.nsfw ?? false;
+    public permission = (this.data.permission_overwrites ?? []).map(({ id, type, deny, allow }) => { return { id, type, deny: new OverwriteBitField(Number(deny)), allow: new OverwriteBitField(Number(allow)) } });
+    public position = this.data.position;
+    public parent = this.data.parent_id ?? undefined;
+    public guildId = this.data.guild_id ?? "";
+    public guild: Guild;
+    public lastPin = this.data.last_pin_timestamp ?? undefined;
+    public lastMessage = this.data.last_message_id ?? undefined;
+    private _cache_messages = new MessagesManager(this.client);
+
+    toJson() {
+        return this.data;
     };
 
-   get topic(){
-        return this.forum?.topic;
-    }
-    get nsfw(){
-        return this.forum.nsfw ?? false;
+    get messages() {
+        this._cache_messages.fetchall(this.id);
+        return this._cache_messages;
     };
 
-    get permission(){
-        return this.forum.permission_overwrites ?? [];
-    };
+    private _patch(data: APIGuildForumChannel) {
+        if (this.name != this.data.name) this.name = data.name;
+        if (this.data.flags != data.flags ?? 0) this.flags = new channelFlags(data.flags).freeze();
+        if (this.data?.topic !== data.topic) this.topic = data.topic ?? "";
+        if (this.data.nsfw !== data.nsfw) this.nsfw = data.nsfw ?? false;
+        if (this.data.permission_overwrites !== data.permission_overwrites) this.permission = (data.permission_overwrites ?? []).map(({ id, type, deny, allow }) => ({ id, type, deny: new OverwriteBitField(Number(deny)), allow: new OverwriteBitField(Number(allow)) }));
+        if (this.data.position !== data.position) this.position = data.position;
+        if (this.data?.parent_id !== data.parent_id) this.parent = data.parent_id ?? undefined;
+        if (this.data?.guild_id !== data.guild_id) this.guildId = data.guild_id ?? "";
+        if (this.data.last_pin_timestamp !== data.last_pin_timestamp) this.lastPin = data.last_pin_timestamp ?? undefined;
+        if (this.data.last_message_id !== data.last_message_id) this.lastMessage = data.last_message_id ?? undefined;
 
-    get position(){
-        return this.forum.position;
-    };
 
-    get parent(){
-        return this.forum.parent_id;
-    };
-
-    get toJson(){
-        return this.forum;
-    };
-
-    setLast(data: { pin?: string, msg?: string }){
-        if( data.msg ) this.lastMessage = data.msg;
-        if( data.pin  && !isNaN(+new Date(data.pin)) ) this.lastPin = data.pin;
+        this.data = data;
         return this;
     };
 };

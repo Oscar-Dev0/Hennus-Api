@@ -2,60 +2,54 @@ import { APIGuildStageVoiceChannel, APIGuildVoiceChannel } from "discord-api-typ
 import { BaseChannel } from "../base/channel";
 import { Client } from "../../core";
 import { Guild } from "../guild";
-import { MessagesCollection } from "../../utils";
+import { MessagesManager } from "../../utils";
+import { channelFlags, OverwriteBitField } from "../bitfield";
 
 export class BasedVoiceChannel extends BaseChannel {
 
-    private _cache_messages = new MessagesCollection();
-    private voice: APIGuildVoiceChannel | APIGuildStageVoiceChannel;
-    public guildId: string;
-    public guild: Guild;
-    public lastMessage: string;
+ 
 
-    constructor(data: APIGuildVoiceChannel | APIGuildStageVoiceChannel, client: Client){
+    constructor(private data: APIGuildVoiceChannel | APIGuildStageVoiceChannel, client: Client){
         super(data, client);
-        this.voice = data;
+        Object.defineProperty(this, "data", { value: data });
 
-        this.client = client;
-        if(data.guild_id) this.guildId = data.guild_id;
-
-        const guild = this.client.guilds.get(this.guildId);
+        const guild = this.client.guilds.cache.get(this.guildId);
         if(guild) this.guild = guild;
-
-        if(data.last_message_id) this.lastMessage = data.last_message_id;
-
     };
 
-    get bitrate(){
-        return this.voice.bitrate || 0;
-    };
+    private _cache_messages = new MessagesManager(this.client);
+    public guildId: string = this.data.guild_id ?? "";
+    public guild: Guild;
+    public lastMessage: string = this.data.last_message_id ?? "";
+    public bitrate =  this.data.bitrate || 0;
+    public nsfw = this.data.nsfw ?? false;
+    public permission = (this.data.permission_overwrites ?? []).map(({id, type, deny, allow})=> { return{ id, type, deny: new OverwriteBitField(Number(deny) ), allow:  new OverwriteBitField(Number(allow))} } );
+    public position = this.data.position;
+    public parent =  this.data.parent_id ?? undefined;
 
     get messages(){
-        return this._cache_messages.restSet(this.client.rest, this.id);
-    };
-    
-    get nsfw(){
-        return this.voice.nsfw ?? false;
+        this._cache_messages.fetchall(this.id);
+        return this._cache_messages;
     };
 
-    get permission(){
-        return this.voice.permission_overwrites ?? [];
-    };
+   private  _patch(data: APIGuildVoiceChannel | APIGuildStageVoiceChannel){
+        if (this.name != this.data.name) this.name = data.name;
+        if (this.data.flags != data.flags ?? 0) this.flags = new channelFlags(data.flags).freeze();
+        if (this.data.nsfw !== data.nsfw) this.nsfw = data.nsfw ?? false;
+        if (this.data.permission_overwrites !== data.permission_overwrites) this.permission = (data.permission_overwrites ?? []).map(({ id, type, deny, allow }) => ({ id, type, deny: new OverwriteBitField(Number(deny)), allow: new OverwriteBitField(Number(allow)) }));
+        if (this.data.position !== data.position) this.position = data.position;
+        if (this.data?.parent_id !== data.parent_id) this.parent = data.parent_id ?? undefined;
+        if (this.data?.guild_id !== data.guild_id) this.guildId = data.guild_id ?? "";
+        if (this.data.last_message_id !== data.last_message_id) this.lastMessage = data.last_message_id ?? "";
+        if(this.data.bitrate !== data.bitrate) this.bitrate = data.bitrate ?? 0;
 
-    get position(){
-        return this.voice.position;
-    };
 
-    get parent(){
-        return this.voice.parent_id;
-    };
-
-    setlast(id: string){
-        this.lastMessage = id;
+        this.data = data;
+        return this;
     };
 
     toJson(){
-        return this.voice;
+        return this.data;
     };
 
 };

@@ -24,13 +24,12 @@ export class Message {
         if(message.channel_id) this.channelId = message.channel_id;
         
 
-        const channel = client.channels.get(this.channelId);
+        const channel = client.channels.cache.get(this.channelId);
         if(channel) this.channel = channel;
-        if(channel && ( channel.isChannelCategory() || channel.isChannelForum() || channel.isChannelText() || channel.isChannelVoice() || channel.isChannelthread())) this.guildId = channel.guildId;
+        if( !message.guild_id && channel && ( channel.isChannelCategory() || channel.isChannelForum() || channel.isChannelText() || channel.isChannelVoice() || channel.isChannelthread())) this.guildId = channel.guildId;
 
-        const guild = client.guilds.get(this.guildId);
+        const guild = client.guilds.cache.get(this.guildId);
         if(guild) this.guild = guild;
-
         
     };
 

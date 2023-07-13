@@ -1,17 +1,45 @@
-import { Collection } from "@discordjs/collection";
-import { Message } from "../../types";
-import { RestSession } from "../../rest";
 
-export class MessagesCollection extends Collection<string, Message> {
+import { Message } from "../../types";
+import { cacheManager } from "./base";
+import { Snowflake } from "discord-api-types/globals";
+import { Client } from "../../core";
+
+export class MessagesManager extends cacheManager<Snowflake, Message> {
+
+    constructor(client: Client){
+        super(client);
+    };
 
     public search = false;
 
-    constructor() {
-        super();
+    async fetch(id: string, options?: force){
+            const cache = this.cache.get(id);
+            if(options?.force){
+                const message = await this.rest.get("channelMessage", options.channelId, id);
+                if( !cache && message ) this.cache.set(message.id, message);
+                return message;
+            };
+            return cache;
     };
 
-    restSet(rest: RestSession, channel_id: string){
-        if(!this.search) rest.get("channelMessages", channel_id).then((msgs)=>{ this.search = true; msgs?.forEach((msg)=>this.set(msg.id, msg))});
+    async fetchall( channelId: string){
+            if(!this.search) this.rest.get("channelMessages", channelId).then((msgs)=>{ this.search = true; msgs?.forEach((msg)=>this.cache.set(msg.id, msg))});
+            return this.cache;
+    };
+
+    update(message: Message){
+        if (this.cache.has(message.id)){
+            const oldMessage = this.cache.get(message.id);
+            if(message.editedTimestamp !== oldMessage?.editedTimestamp){
+                this.cache.delete(message.id);
+                this.cache.set(message.id, message);
+            };
+        } else {
+            this.cache.set(message.id, message);
+        };
         return this;
     };
 };
+
+
+type force = { force: true, channelId: Snowflake } | { force: false };

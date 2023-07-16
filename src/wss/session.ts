@@ -1,8 +1,9 @@
-import { WebSocketManager, WebSocketShardEvents } from "@discordjs/ws";
-import { Client, EventsString } from "../core";
+import { WebSocketManager, WorkerShardingStrategy } from "@discordjs/ws";
+import { Client, } from "../core";
 import { REST } from "@discordjs/rest";
-import { APIChannel, ChannelType, GatewayDispatchEvents, GatewayDispatchPayload, GatewayIntentBits, GatewayReadyDispatchData } from "discord-api-types/v10";
-import { BasedCategoryChannel, BasedDmChannel, BasedForumChannel, BasedTextChannel, BasedThreadChannel, BasedVoiceChannel, Channel, Guild, Message, Ready } from "../types";
+import { ChannelType, GatewayDispatchEvents, GatewayDispatchPayload, GatewayIntentBits, GatewayOpcodes, GatewayReadyDispatchData, GatewayRequestGuildMembersData, GatewayRequestGuildMembersDataWithQuery } from "discord-api-types/v10";
+import { BasedCategoryChannel, BasedDmChannel, BasedForumChannel, BasedTextChannel, BasedThreadChannel, BasedVoiceChannel, Channel, Guild, Message, Ready, User } from "../types";
+import { Presence } from "../types/events/Presence";
 
 export class WebSession extends WebSocketManager {
 
@@ -14,6 +15,9 @@ export class WebSession extends WebSocketManager {
             token: client.token,
             intents: client.intents.bitfield,
             rest,
+            buildStrategy: (manager) => new WorkerShardingStrategy(manager, { shardsPerWorker: 'all' }),
+            shardCount: client.options.sharCount,
+            shardIds: client.options.shardIds
         });
         Object.defineProperty(this, "client", {
             value: client,
@@ -22,7 +26,7 @@ export class WebSession extends WebSocketManager {
 
 
     async Handler(data: GatewayDispatchPayload) {
-        console.log(data.t)
+        if(data.t != GatewayDispatchEvents.PresenceUpdate) console.log(data.t);
         if(data.t == GatewayDispatchEvents.GuildCreate){
             //Cargando todo.
             const guild = new Guild(data.d, this.client);
@@ -30,7 +34,6 @@ export class WebSession extends WebSocketManager {
             guild.roles.setall(data.d.roles);
             const channels: any = [...data.d.channels, ...data.d.threads].map((channel)=>{ let ch: Channel | undefined = undefined; if (channel.type == ChannelType.GuildText || channel.type == ChannelType.GuildAnnouncement) ch = new BasedTextChannel(channel, this.client); else if (channel.type == ChannelType.DM || channel.type == ChannelType.GroupDM) ch = new BasedDmChannel(channel, this.client); else if (channel.type == ChannelType.GuildVoice || channel.type == ChannelType.GuildStageVoice) ch = new BasedVoiceChannel(channel, this.client); else if (channel.type == ChannelType.GuildCategory) ch = new BasedCategoryChannel(channel, this.client); else if (channel.type == ChannelType.GuildForum) ch = new BasedForumChannel(channel, this.client); else if (channel.type == ChannelType.PublicThread || channel.type == ChannelType.PrivateThread || channel.type == ChannelType.AnnouncementThread) ch = new BasedThreadChannel(channel, this.client); return ch; } ).filter((x) => x !== undefined);
             this.client.channels.setall(channels);
-            console.log(data.d.members.length)
             guild.members.setall(data.d.members, guild);
 
             const cache = this.client.guilds.cache.get(guild.id);
@@ -120,8 +123,18 @@ export class WebSession extends WebSocketManager {
             if (channel && !channel.isChannelCategory()) {
                 channel.messages.update(New_msg);
             };
-        } else if (data.t == GatewayDispatchEvents.GuildRoleUpdate) {
-            data.d
+        } else if (data.t == GatewayDispatchEvents.GuildRoleCreate) {
+            data.d.role
+        } else if(data.t == GatewayDispatchEvents.PresenceUpdate){
+            const presence = new Presence(data.d, this.client);
+
+            this.client.emit("PresenceUpdate", presence);
+            if(!this.client.users.cache.has(presence.user.id)) this.client.users.cache.set(presence.user.id, presence.user);
+        } else if(data.t == GatewayDispatchEvents.UserUpdate){
+            const user = new User(data.d, this.client);
+            
+            this.client.users.update(user);
+            this.client.emit("UserUpdate", user);
         };
     };
 

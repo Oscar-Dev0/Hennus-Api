@@ -1,4 +1,5 @@
 import { APIEmbed } from "discord-api-types/v10";
+import { colorType, resolvedColor } from "../utils";
 
 export class EmbedBuilder {
 
@@ -20,7 +21,7 @@ export class EmbedBuilder {
         this.description = options?.description;
         this.url = options?.url;
         this.timestamp = options?.timestamp;
-        this.color = options?.color;
+        this.color = options?.color ?? resolvedColor("Default");
         this.footer = options?.footer;
         this.image = options?.image;
         this.thumbnail = options?.thumbnail;
@@ -53,28 +54,8 @@ export class EmbedBuilder {
         return this;
     };
 
-    setColor(color: number | "Red" | "Blue" | "Yellow" | "Orange" | "Green" | "Purple" | "Cyan" | `#${string}`) {
-        if (typeof color == "number") {
-            this.color = color;
-        } else if (typeof color == "string") {
-            if (color == "Blue") {
-                this.color = 0x0000ff;
-            } else if (color == "Red") {
-                this.color = 0xff0000;
-            } else if (color == "Green") {
-                this.color = 0x00ff00;
-            } else if (color == "Orange") {
-                this.color = 0xffbf00
-            } else if (color == "Yellow") {
-                this.color = 0xffff00;
-            } else if (color == "Purple") {
-                this.color = 0x8000ff;
-            } else if (color == "Cyan") {
-                this.color = 0x00ffff;
-            } else if (/\#\w+/.test(color)) {
-                this.color = Number(color.replace("#", "0x"));
-            };
-        };
+    setColor(color: colorType) {
+        this.color = resolvedColor(color);
         return this;
     };
 
@@ -83,8 +64,11 @@ export class EmbedBuilder {
         return this;
     };
 
-    setimage(option: APIEmbed["image"]) {
-        this.image = option;
+    setimage(option: APIEmbed["image"] | string) {
+        let opt: APIEmbed["image"] = { "url": "" };
+        if (option && typeof option === 'object') opt = option;
+        else if (typeof option ==='string') opt['url'] = option;
+        this.image = opt;
         return this;
     };
 

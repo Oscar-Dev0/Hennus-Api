@@ -1,5 +1,6 @@
 import { APIMessage, Routes } from "discord-api-types/v10";
 import { Message, MessageCreateOptions } from "../../../types";
+import { RawFile } from "@discordjs/rest";
 
 export interface postReturn {
     channelMessages: APIMessage;
@@ -26,5 +27,5 @@ export function postRoutes< T extends keyof postOptions,D extends postType<T>>(t
 };
 
 export interface postNode {
-    channelMessages: { return: Message, args: MessageCreateOptions, data: postOptions["channelMessages"]};
+    channelMessages: { return: Message, args: MessageCreateOptions | { files: RawFile[], body?: MessageCreateOptions }, data: postOptions["channelMessages"]};
 };

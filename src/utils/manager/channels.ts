@@ -12,8 +12,7 @@ export class ChannelsManager extends cacheManager<string, Channel> {
     private _maps = false;
 
     setall(map: Channel[]) {
-        if (!this._maps && map && Array.isArray(map)) {
-            this._maps = true;
+        if (map && Array.isArray(map)) {
             map.forEach((channel) => { if (channel) this.cache.set(channel.id, channel); });
             return true;
         } else {

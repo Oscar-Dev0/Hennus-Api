@@ -9,7 +9,7 @@ import { ChannelsManager, GuildsManager, UsersManager } from "../utils";
 
 export class Client extends BaseClient {
 
-    constructor(options: ClientOptions) {
+    constructor(public options: ClientOptions) {
         super();
         if (!options.token && options.token.length == 0) throw new HennusError(errorCodes.tokenNull);
         this.token = options.token;

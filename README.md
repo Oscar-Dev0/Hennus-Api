@@ -9,6 +9,27 @@ Esta npm es una prueba privada es una prueba para usarla en un bot publico.
 |---------|---------|
 | Hennus-Bot | [Discord](https://discord.gg/3nqwV9FK4E) |
 
+## Ejemplo
+
+```ts
+const { GatewayIntentBits, Client } = require("hennus-api");
+
+const client =  new Client(
+    {
+        token: "Token",
+        intents: [ GatewayIntentBits.Guilds ],  
+    }
+);
+
+client.on("Ready", (ready)=>{
+    console.log("Bot Prendido")
+});
+
+
+client.login();
+
+```
+
 ## **Problemas**
 
 No hay soporte para esta npm si la usar ten en consideracion que esto es una prueba mas que nada.

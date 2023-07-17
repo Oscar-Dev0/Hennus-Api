@@ -38,14 +38,4 @@ export class BaseClient extends EventEmitter2 {
         return super.emit(event, ...args);
     };
 
-
-    setUser(user: User) {
-        this.user = user;
-        this.id = user.id;
-    };
-
-    setAplication(id: Snowflake) {
-        this.aplicationId = id;
-    };
-
 };

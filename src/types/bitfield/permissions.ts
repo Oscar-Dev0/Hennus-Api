@@ -4,7 +4,7 @@ import { Permissions } from "../base/permissions"
 
 
 export class PermissionsBitField extends BitField<PermissionsString> {
-    public override Flags: typeof Permissions;
+    public declare Flags: typeof Permissions;
     
     public static All = Object.values(PermissionFlagsBits).reduce((all, p) => all | p, BigInt(0));
 

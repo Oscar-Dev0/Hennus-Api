@@ -10,16 +10,23 @@ import { RawFile } from "@discordjs/rest";
 
 
 export class BaseChannel extends BaseData {
+    public id: string = "";
+    public name: string = "";
+    public flags: channelFlags["freeze"];
+    public type: ChannelType;
+
     constructor(private _data: APIChannel, client: Client) {
         super(client);
+        this._data = _data;
         Object.defineProperty(this, "_data", { value: _data });
+        this.id = this._data.id;
+        this.name = this._data.name ?? "";
+        this.flags = new channelFlags(this._data.flags).freeze;
+        this.type = this._data.type;
     };
 
 
-    public id = this._data.id;
-    public name = this._data.name ?? "";
-    public flags = new channelFlags(this._data.flags).freeze();
-    public type = this._data.type;
+
 
     get createdTimestamp() {
         return DiscordSnowflake.timestampFrom(this.id);

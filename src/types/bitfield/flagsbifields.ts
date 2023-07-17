@@ -2,8 +2,8 @@ import { ChannelFlags as CF, GuildMemberFlags } from "discord-api-types/v10";
 import { BitField, BitFieldResolvable } from ".";
 
 export class MemberFlags extends BitField <GuildMemberFlagsString, GuildMemberFlags>{
-    public override Flags: GuildMemberFlags;
-    public override bitfield: GuildMemberFlags;
+    public declare Flags: GuildMemberFlags;
+    public declare bitfield: GuildMemberFlags;
 
     public override resolve(bit?: GuildMemberFlags ): GuildMemberFlags{
         return super.resolve(bit) as GuildMemberFlags;
@@ -16,8 +16,8 @@ export class MemberFlags extends BitField <GuildMemberFlagsString, GuildMemberFl
 };
 
 export class channelFlags extends BitField<ChannelFlagsStrinmg, CF >{
-    public override Flags: CF;
-    public override bitfield: CF;
+    public declare Flags: CF;
+    public declare bitfield: CF;
 
     public override resolve(bit?: CF ): CF{
         return super.resolve(bit) as CF;

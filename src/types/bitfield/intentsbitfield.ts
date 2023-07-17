@@ -3,8 +3,8 @@ import { BitField, BitFieldResolvable } from ".";
 export type GatewayIntentsString = keyof typeof GatewayIntentBits;
 
 export class IntentsBitField extends BitField<GatewayIntentsString>{
-  public override Flags: typeof GatewayIntentBits;
-  public override bitfield: GatewayIntentBits; 
+  public declare Flags: typeof GatewayIntentBits;
+  public declare bitfield: GatewayIntentBits; 
   public override resolve(bit?: BitFieldResolvable<GatewayIntentsString, number>): number {
     //@ts-ignore 
     return super.resolve(bit);

@@ -1,35 +1,52 @@
+// Import required types and classes
 import { APIUser, UserPremiumType } from "discord-api-types/v10";
 import { Client } from "../../core";
 import { ImageURLOptions } from "@discordjs/rest";
 import { BaseData } from "../base/data";
 
+// Declare the class
 export class BaseUser extends BaseData {
-    constructor( private data: APIUser, client: Client ){
+    // Properties of the class based on the APIUser data
+    public id: string;
+    public username: string;
+    public discriminator: string;
+    public premium: UserPremiumType;
+    public bot: boolean;
+    public globalName: string;
+    public color: number;
+    public avatar: string | undefined;
+    public banner: string | undefined;
+
+    constructor(private data: APIUser, client: Client) {
+        // Call the constructor of the parent class (BaseData)
         super(client);
-        Object.defineProperty(this, "data", { value: data});
-    };
 
-    public id = this.data.id;
-    public username = this.data.username;
-    public discriminator = this.data.discriminator;
-    public premium = this.data.premium_type ?? UserPremiumType.None;
-    public bot = this.data.bot ?? false;
-    public globalName = this.data.global_name ?? "";
-    public color = this.data.accent_color ?? 0;
-    public avatar = this.data.avatar ?? undefined;
-    public banner = this.data.banner ?? undefined;
+        // Set the values of the properties using the "data" parameter passed to the constructor
+        this.id = data.id;
+        this.username = data.username;
+        this.discriminator = data.discriminator;
+        this.premium = data.premium_type ?? UserPremiumType.None;
+        this.bot = data.bot ?? false;
+        this.globalName = data.global_name ?? "";
+        this.color = data.accent_color ?? 0;
+        this.avatar = data.avatar ?? undefined;
+        this.banner = data.banner ?? undefined;
+    }
 
-    avatarUrl(options?: ImageURLOptions){
-        if(!this.avatar) return undefined;
+    // Method to get the URL for the user's avatar
+    avatarUrl(options?: ImageURLOptions) {
+        if (!this.avatar) return undefined;
         return this.cdn.avatar(this.id, this.avatar, options);
-    };
-    
-    bannerURL(options?: ImageURLOptions){
-        if(!this.banner) return undefined;
-        return this.cdn.banner(this.id, this.banner, options);
-    };
+    }
 
-    toJson(){
+    // Method to get the URL for the user's banner
+    bannerURL(options?: ImageURLOptions) {
+        if (!this.banner) return undefined;
+        return this.cdn.banner(this.id, this.banner, options);
+    }
+
+    // Method to convert the user data to JSON
+    toJson() {
         return this.data;
-    };
-};
+    }
+}

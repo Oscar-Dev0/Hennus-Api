@@ -6,6 +6,7 @@ import { WebSession } from "../wss";
 import { HennusError, errorCodes } from "./Error";
 import { WebSocketShardEvents } from "@discordjs/ws";
 import { ChannelsManager, GuildsManager, UsersManager } from "../utils";
+import { ClientUser } from "../types";
 
 export class Client extends BaseClient {
 
@@ -32,7 +33,13 @@ export class Client extends BaseClient {
         try {
             await this.wss.connect();
             this.wss.on(WebSocketShardEvents.Dispatch, ({ data }) => this.wss.Handler(data));
-            this.wss.on(WebSocketShardEvents.Ready, ({data})=> this.wss.ready(data));
+            this.wss.on(WebSocketShardEvents.Ready, ({data})=> {
+                this.user = new ClientUser(data.user, this);
+                this.id = data.user.id;
+                this.aplicationId = data.application.id;
+
+                this.wss.ready(data);
+            });
             //this.wss.send(0, { op: GatewayOpcodes.RequestGuildMembers, d: { guild_id: "", query: "", limit: 0 } })
         }
         catch {

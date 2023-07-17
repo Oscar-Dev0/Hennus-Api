@@ -47,7 +47,7 @@ export class WebSession extends WebSocketManager {
                     //@ts-ignore
                     cache.data = data.d;
                     if(data.d.approximate_member_count && cache.memberCount != data.d.approximate_member_count) cache.memberCount = data.d.approximate_member_count;
-                    if(data.d.description !== cache.description) cache.description = data.d.description;
+                    if(data.d.description !== cache.description) cache.description = data.d.description ?? undefined;
                     if(data.d.name != cache.name) cache.name = data.d.name;
                     this.client.emit("GuildUpdate", cache);
                     this.client.guilds.cache.set(data.d.id, cache);
@@ -135,6 +135,10 @@ export class WebSession extends WebSocketManager {
             
             this.client.users.update(user);
             this.client.emit("UserUpdate", user);
+        } else if(data.t == GatewayDispatchEvents.GuildMemberAdd){
+            const guild = this.client.guilds.resolve(data.d.guild_id);
+            
+            data.d
         };
     };
 
@@ -163,8 +167,5 @@ export class WebSession extends WebSocketManager {
 
             };
         };
-
-        if (!this.client.id) this.client.setUser(ready.user);
-        if (!this.client.aplicationId) this.client.setAplication(data.application.id);
     };
 };

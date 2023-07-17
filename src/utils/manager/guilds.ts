@@ -17,5 +17,13 @@ export class GuildsManager extends cacheManager<string, Guild> {
         };
         return cache;
     };
+
+    add(guild: Guild){
+        if(this.resolve(guild)){
+            this.cache.delete(guild.id);
+            this.cache.set(guild.id, guild);
+        } else this.cache.set(guild.id, guild);
+        return this;
+    };
     
 };

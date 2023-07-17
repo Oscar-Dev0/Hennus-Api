@@ -47,4 +47,13 @@ export class MembersManager extends cacheManager<string, GuildMember> {
         };
         return this.cache;
     };
+
+    add(member: GuildMember){
+        const cache = this.resolve(member.user?.id ?? "");
+        if( member.user && cache){
+            this.cache.delete(member.user?.id);
+            this.cache.set(member.user.id, member);
+        } else if(member.user) this.cache.set(member.user.id, member);
+        return this;
+    };
 };

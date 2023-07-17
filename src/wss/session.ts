@@ -2,7 +2,7 @@ import { WebSocketManager, WorkerShardingStrategy } from "@discordjs/ws";
 import { Client, } from "../core";
 import { REST } from "@discordjs/rest";
 import { ChannelType, GatewayDispatchEvents, GatewayDispatchPayload, GatewayIntentBits, GatewayOpcodes, GatewayReadyDispatchData, GatewayRequestGuildMembersData, GatewayRequestGuildMembersDataWithQuery } from "discord-api-types/v10";
-import { BasedCategoryChannel, BasedDmChannel, BasedForumChannel, BasedTextChannel, BasedThreadChannel, BasedVoiceChannel, Channel, Guild, Message, Ready, User } from "../types";
+import { BasedCategoryChannel, BasedDmChannel, BasedForumChannel, BasedTextChannel, BasedThreadChannel, BasedVoiceChannel, Channel, Guild, GuildMember, Message, Ready, User } from "../types";
 import { Presence } from "../types/events/Presence";
 
 export class WebSession extends WebSocketManager {
@@ -137,8 +137,60 @@ export class WebSession extends WebSocketManager {
             this.client.emit("UserUpdate", user);
         } else if(data.t == GatewayDispatchEvents.GuildMemberAdd){
             const guild = this.client.guilds.resolve(data.d.guild_id);
+            let member: GuildMember | undefined = undefined;
+
+            if(guild) { 
+                if(data.d.user && !guild.members.resolve(data.d.user?.id ?? "")) {
+                    guild.memberCount = guild.memberCount + 1;
+                    member = new GuildMember(data.d, guild, this.client);
+                    guild.members.cache.set(data.d.user.id, member);    
+                    this.client.guilds.add(guild);          
+                } else member = new GuildMember(data.d, guild, this.client);
+            };
+            if(member){
+                this.client.emit("GuildMemberAdd", member);
+            };
+        } else if(data.t == GatewayDispatchEvents.GuildMemberRemove){
+            const id = data.d.user.id;
+            const guildId = data.d.guild_id;
+            const guild = this.client.guilds.resolve(guildId);
+            if(guild){
+                const member = guild.members.resolve(id);
+                if(member){
+                    this.client.emit("GuildMemberRemove", member);
+                    guild.memberCount = guild.memberCount - 1;
+                    guild.members.cache.delete(id);
+                    this.client.guilds.add(guild)
+                };
+            };
+        } else if(data.t == GatewayDispatchEvents.GuildMemberUpdate){
+            const id = data.d.user.id;
+            const guildId = data.d.guild_id;
+            const guild = this.client.guilds.resolve(guildId);
+            if(guild){
+                const oldMember = guild.members.resolve(id);
+                const newMember = new GuildMember(data.d as any, guild, this.client);
+                this.client.emit("GuildMemberUpdate", newMember, oldMember);
+                guild.members.add(newMember);
+                this.client.guilds.add(guild);
+            };
+        } else if(data.t == GatewayDispatchEvents.GuildMembersChunk){
+            const guildId = data.d.guild_id;
+            const guild = this.client.guilds.resolve(guildId);
+            if(guild){
+                const count = data.d.chunk_count;
+                guild.memberCount = guild.memberCount + count;
+                const members = data.d.members.map((member => new GuildMember(member, guild, this.client)));
+                this.client.emit("GuildMembersChunk", members);
+                members.forEach((member)=>{
+                    guild.members.add(member);
+                });
+            };
             
-            data.d
+            if(this.client.intents.has(GatewayIntentBits.GuildMembers) && data.d.presences) data.d.presences.forEach((presence)=>{
+                const user = new User(presence.user as any , this.client);
+                this.client.users.update(user);
+            });
         };
     };
 

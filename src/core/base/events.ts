@@ -1,4 +1,4 @@
-import { Channel, Guild, Message, Ready, User } from "../../types";
+import { Channel, Guild, GuildMember, Message, Ready, User } from "../../types";
 import { Presence } from "../../types/events/Presence";
 
 export interface ListEvents {
@@ -13,10 +13,10 @@ export interface ListEvents {
     GuildDelete : [ guild: Guild ],
     GuildEmojisUpdate : [],
     GuildIntegrationsUpdate : [],
-    GuildMemberAdd : [],
-    GuildMemberRemove : [],
-    GuildMembersChunk : [],
-    GuildMemberUpdate : [],
+    GuildMemberAdd : [ member: GuildMember ],
+    GuildMemberRemove : [ member: GuildMember ],
+    GuildMembersChunk : [ members: GuildMember[] ],
+    GuildMemberUpdate : [ NewMember: GuildMember, OldMember?: GuildMember],
     GuildRoleCreate : [],
     GuildRoleDelete : [],
     GuildRoleUpdate : [],

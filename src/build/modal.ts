@@ -3,9 +3,9 @@ import { ActionRowBuilder } from "./actionrow";
 import { TextInputBuilder } from "./textinput";
 
 export class ModalBuilder {
-    public components:Array<ActionRowBuilder>;
+    public components: Array<ActionRowBuilder>;
     public title?: string;
-    public custom_id?: string
+    public custom_id?: string;
 
     constructor(options?: {
         title: string;
@@ -18,40 +18,40 @@ export class ModalBuilder {
 
         if (options?.components) {
             this.setComponents(options.components);
-        };
-    };
+        }
+    }
 
-    setTitle(title: string) {
+    public setTitle(title: string): this {
         this.title = title;
         return this;
-    };
+    }
 
-    setCustomId(custom: string) {
-        this.custom_id = custom;
+    public setCustomId(custom_id: string): this {
+        this.custom_id = custom_id;
         return this;
-    };
+    }
 
-    addTextInputComponents(components: Array<TextInputBuilder>) {
-        const data = [...this.components];
-        components.forEach((component) => {
-            const map = this.components.filter(x => x.components.find(z => { if(z.type !== ComponentType.Button) z.custom_id == component.custom_id}));
-            if (!map.length) {
-                data.push(new ActionRowBuilder().AddComponet(component));
+    public addTextInputComponents(components: Array<TextInputBuilder>): this {
+        for (const component of components) {
+            if (!this.findComponentById(component.custom_id?? "", ComponentType.Button)) {
+                this.components.push(new ActionRowBuilder().AddComponent(component));
             }
-        });
-        this.components = data;
+        }
         return this;
-    };
+    }
 
-    setComponents(components: Array<ActionRowBuilder>, limitRows?: number) {
+    public setComponents(components: Array<ActionRowBuilder>, limitRows?: number): this {
         const data = limitRows ? components.slice(0, limitRows) : components;
         this.components = data;
         return this;
     }
 
-    addComponent(component: TextInputBuilder) {
-        const data = [...this.components, new ActionRowBuilder().AddComponet(component)];
-        this.components = data;
+    public addComponent(component: TextInputBuilder): this {
+        this.components.push(new ActionRowBuilder().AddComponent(component));
         return this;
-    };
+    }
+
+    private findComponentById(customId: string, type: ComponentType): ActionRowBuilder | undefined {
+        return this.components.find((actionRow) => actionRow.components.some((comp) => comp.type === type && comp.custom_id === customId));
+    }
 }

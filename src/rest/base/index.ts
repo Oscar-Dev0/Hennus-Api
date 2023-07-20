@@ -3,7 +3,7 @@ import { Client } from "../../core";
 import { GetRoutes, getOptions, getReturn, postOptions, postReturn, postRoutes } from "../types";
 
 
-export class BaseRest {
+export class BaseRestFunction {
 
     public api: REST;
     public cdn = new CDN("https://cdn.discordapp.com/");

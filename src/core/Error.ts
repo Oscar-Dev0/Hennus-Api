@@ -1,25 +1,26 @@
 export class HennusError extends Error {
-    constructor(message: errorCodes) {
+    constructor(message: errorCodes | string) {
         super(message);
-        this.name = "HennusError"
-    };
-};
-
-
+        this.name = "HennusError";
+    }
+}
 
 export enum errorCodes {
-
     /* Tokens */
-    tokenInvalid = "Token es invalido.",
-    tokenNull = "Token no proporcionado.",
+    TokenInvalid = "El token proporcionado no es válido.",
+    TokenNull = "No se proporcionó un token.",
 
-    /* Conection */ 
-    connectError = "No se pudo conectar.",
+    /* Connection */
+    ConnectionError = "No se pudo establecer la conexión.",
 
     /* Bits */
-    bitsError = "No es una bitField valida.",
+    BitsError = "La bitField proporcionada no es válida.",
 
     /* ResolveColor */
     ColorRange = "El valor del color está fuera del rango válido (0 a 0xffffff).",
-    ColorConvert ='El valor del color no es válido o no se puede convertir correctamente.',
+    ColorConvert = "El valor del color no es válido o no se puede convertir correctamente.",
+
+    /* Commands */
+    CommandNameUpperCase = "El nombre del comando no debe contener letras mayúsculas.",
+    InvalidCommandNameLength = "El nombre del comando debe tener entre 1 y 32 caracteres.",
 }

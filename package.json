@@ -1,6 +1,6 @@
 {
   "name": "hennus-api",
-  "version": "0.1.1-Demo",
+  "version": "0.1.2-Demo",
   "description": "Esta es una libreria para el bot Hennus",
   "main": "app/index.js",
   "types": "typescript/index.d.ts",

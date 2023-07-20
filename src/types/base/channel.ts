@@ -2,7 +2,7 @@ import { APIChannel, ChannelType } from "discord-api-types/v10";
 import { DiscordSnowflake } from "@sapphire/snowflake"
 import { BasedCategoryChannel, BasedDmChannel, BasedForumChannel, BasedTextChannel, BasedThreadChannel, BasedVoiceChannel } from "../channel";
 import { Client } from "../../core";
-import { MessageCreateData, MessageCreateOptions } from "../message";
+import { MessageChannelOptions, MessageCreateData } from "../message";
 import { BaseData } from "./data";
 import { channelFlags } from "../bitfield";
 import FormData from "form-data";
@@ -74,12 +74,12 @@ export class BaseChannel extends BaseData {
         if (this.type == ChannelType.GuildCategory) return undefined;
         //@ts-ignore
         const id = (this._data ?? this.data).id;
-        const mData: MessageCreateOptions = {
+        const mData: MessageChannelOptions = {
             content: undefined,
             embeds: undefined,
             components: undefined,
         };
-        let data: MessageCreateOptions | { files: RawFile[], body?: MessageCreateOptions } | undefined = undefined;
+        let data: MessageChannelOptions | { files: RawFile[], body?: MessageChannelOptions } | undefined = undefined;
 
         if (typeof options === 'string') {
             mData.content = options;

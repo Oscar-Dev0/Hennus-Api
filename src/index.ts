@@ -1,4 +1,4 @@
-export * from "./wss";
+export * from "./ws";
 export * from "./rest";
 export * from "./core";
 export * from "./build";

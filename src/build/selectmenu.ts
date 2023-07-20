@@ -1,127 +1,103 @@
-import { APISelectMenuComponent, APISelectMenuOption, ChannelType, ComponentType  } from "discord-api-types/v10";
+import { APISelectMenuComponent, APISelectMenuOption, ChannelType, ComponentType } from "discord-api-types/v10";
 
 export class SelectMenuBuilder {
     public custom_id?: APISelectMenuComponent['custom_id'];
     public type: APISelectMenuComponent['type'];
-    public options: APISelectMenuOption[]; 
+    public options: APISelectMenuOption[] = [];
     public channel_types?: ChannelType[];
     public placeholder?: APISelectMenuComponent["placeholder"];
     public min_values?: APISelectMenuComponent["min_values"];
     public max_values?: APISelectMenuComponent["max_values"];
     public disabled?: APISelectMenuComponent["disabled"];
 
-    constructor(options?: APISelectMenuComponent){
+    constructor(options?: {
+        custom_id?: APISelectMenuComponent["custom_id"];
+        type?: selectMenuType;
+        channel_types?: ChannelType[];
+        placeholder?: APISelectMenuComponent["placeholder"];
+        min_values?: APISelectMenuComponent["min_values"];
+        max_values?: APISelectMenuComponent["max_values"];
+        disabled?: APISelectMenuComponent["disabled"];
+        options?: APISelectMenuOption[];
+    }) {
         this.custom_id = options?.custom_id;
-        this.type = options?.type? options?.type : 3;
-        if(options?.type == ComponentType.StringSelect){
-            if(typeof options?.options == "object"){
-                this.save(options.options);
-            };
-        } else if( options?.type == ComponentType.ChannelSelect){
+        this.SetType( options?.type ?? ComponentType.StringSelect);
+
+        if (options?.type == ComponentType.StringSelect && options?.options) {
+            this.save(options.options);
+        } else if (options?.type == ComponentType.ChannelSelect) {
             this.channel_types = options?.channel_types;
-        };
-        this.options = [];
+        }
+
         this.placeholder = options?.placeholder;
         this.min_values = options?.min_values;
         this.max_values = options?.max_values;
         this.disabled = options?.disabled;
-    };
+    }
 
-    SetCustomId(custom: APISelectMenuComponent["custom_id"]){
+    public SetCustomId(custom: APISelectMenuComponent["custom_id"]): this {
         this.custom_id = custom;
         return this;
-    };
+    }
 
-    SetType(type: selectMenuType){
-
-        if(typeof type == "number"){
-            this.type = type;
-        } else if(typeof type == "string"){
-            if(type == "Text") this.type == ComponentType.StringSelect;
-            if(type == "User") this.type == ComponentType.UserSelect;
-            if(type == "Role") this.type == ComponentType.RoleSelect;
-            if(type == "Channels") this.type == ComponentType.ChannelSelect;
-            if(type == "Mentionable") this.type == ComponentType.MentionableSelect;
+    public SetType(type: selectMenuType): this {
+        const typeMap: { [key: string]: APISelectMenuComponent["type"] } = {
+            "Text": ComponentType.StringSelect,
+            "User": ComponentType.UserSelect,
+            "Role": ComponentType.RoleSelect,
+            "Channels": ComponentType.ChannelSelect,
+            "Mentionable": ComponentType.MentionableSelect
         };
+
+        this.type = typeof type === "number" ? type : typeMap[type] ?? 3;
         return this;
-    };
-    
-    setPlaceHolder(text: string){
+    }
+
+    public SetPlaceHolder(text: string): this {
         this.placeholder = text;
         return this;
-    };
+    }
 
-    /**
-     * @description
-     * funcion carga directamente las opciones al cache
-     * @description 
-     * esta funcion solo va con el tipo 3 es un menu de texto
-     */
-    SetOptions(options: APISelectMenuOption[]){
+    public SetOptions(options: APISelectMenuOption[]): this {
         this.options = options;
         return this;
-    };
+    }
 
-    /**
-     * @description
-     * esta funcion carga las opciones ya al cache que existe en el slectmenu.
-     * @description 
-     * esta funcion solo va con el tipo 3 es un menu de texto.
-     */
-    AddOptions(options: APISelectMenuOption[]){
+    public AddOptions(options: APISelectMenuOption[]): this {
         this.save(options);
         return this;
-    };
+    }
 
-    AddOption(option: APISelectMenuOption ){
+    public AddOption(option: APISelectMenuOption): this {
         this.save([option]);
         return this;
-    };
+    }
 
-    /**
-     * @description 
-     * esta funcion solo va con el tipo 8 es un menu de texto.
-     */
-    SetChannelTypes(channel_types: ChannelType[]){
+    public SetChannelTypes(channel_types: ChannelType[]): this {
         this.channel_types = channel_types;
         return this;
-    };
+    }
 
-    SetMinValues(values: APISelectMenuComponent["min_values"]){
-        if(typeof values == "number"){
-            this.min_values = values;
-            if(this.min_values > 25){
-                this.min_values = 25;
-            };
-        };
+    public SetMinValues(values: APISelectMenuComponent["min_values"]): this {
+        this.min_values = typeof values === "number" ? Math.min(values, 25) : undefined;
         return this;
-    };
+    }
 
-    SetMaxValues(values: APISelectMenuComponent["max_values"]){
-        if(typeof values == "number"){
-            this.max_values = values;
-            if(this.max_values > 25){
-                this.max_values = 25;
-            };
-        };
+    public SetMaxValues(values: APISelectMenuComponent["max_values"]): this {
+        this.max_values = typeof values === "number" ? Math.min(values, 25) : undefined;
         return this;
-    };
+    }
 
-    SetDisabled(boolean: APISelectMenuComponent["disabled"]){
-        this.disabled = boolean;
+    public SetDisabled(disabled: APISelectMenuComponent["disabled"]): this {
+        this.disabled = disabled;
         return this;
-    };
+    }
 
-    private save(options?: APISelectMenuOption[]){
-        if(!options) return;
-        if(!this?.type) return;
-        if(this?.type == 3){
-            const map = this.options;
-            options.forEach((x)=>{
-                map?.push(x);
-            })
+    private save(options?: APISelectMenuOption[]): void {
+        if (this.type === 3 && options) {
+            this.options.push(...options);
         }
     }
-};
+}
 
 type selectMenuType = APISelectMenuComponent["type"] | "Text" | "User" | "Role" | "Channels" | "Mentionable";

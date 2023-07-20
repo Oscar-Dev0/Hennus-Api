@@ -1,4 +1,5 @@
 import { HennusError, errorCodes } from "../../core/Error";
+import { Permissions } from "../base/permissions";
 
 export class BitField<T extends string, N extends number | bigint = number> {
     public Flags: EnumLike<unknown, number | bigint> = {};
@@ -116,7 +117,7 @@ export class BitField<T extends string, N extends number | bigint = number> {
             if (!isNaN(Number(bit))) return typeof DefaultBit === 'bigint' ? BigInt(bit) : Number(bit);
             if (this.Flags[bit as keyof typeof this.Flags] !== undefined) return this.Flags[bit as keyof typeof this.Flags];
         };
-        throw new HennusError(errorCodes.bitsError);
+        throw new HennusError(errorCodes.BitsError);
     };
 };
 

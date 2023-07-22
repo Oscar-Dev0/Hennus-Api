@@ -2,7 +2,7 @@ import { APIModalSubmission, APIModalSubmitInteraction } from "discord-api-types
 import { Client } from "../../core";
 import { BasedInteraction } from "../base/interaction";
 
-export class ModalInteraction extends BasedInteraction {
+export class InteractionModal extends BasedInteraction {
 
     private modaldata: APIModalSubmission;
     public customId: string;

@@ -1,4 +1,4 @@
-import { APIInteraction, ChannelType, InteractionResponseType, InteractionType } from "discord-api-types/v10";
+import { APIInteraction, ChannelType, InteractionResponseType, InteractionType, MessageFlags, Routes } from "discord-api-types/v10";
 import { Client } from "../../core";
 import { BaseData } from "./data";
 import { Guild, GuildMember } from "../guild";
@@ -7,6 +7,9 @@ import { Message } from "../events";
 import { User } from "../user";
 import { MessageInteractionOptions } from "../message";
 import { RawFile } from "@discordjs/rest";
+import { InteractionCommands } from "../interaction/commnads";
+import { InteractionButton, InteractionSelectAny } from "../interaction/componets";
+import { InteractionModal } from "../interaction/modal";
 
 export class BasedInteraction extends BaseData {
 
@@ -16,10 +19,10 @@ export class BasedInteraction extends BaseData {
     public guildID: string;
     public guild: Guild;
     public channel: Channel;
-    public message: Message;
+    public message?: Message;
     public type: InteractionType;
-    public member: GuildMember;
-    public user: User;
+    public member?: GuildMember;
+    public user?: User;
 
 
 
@@ -32,37 +35,48 @@ export class BasedInteraction extends BaseData {
         this.guildID = data.guild_id ?? "";
         this.guild = this.client.guilds.resolve(this.guildID) ?? {} as Guild;
         this.channel = this.client.channels.resolve(data.channel?.id ?? "") ?? {} as Channel;
-        this.message = new Message(data.message ?? {} as any, client);
+        if (data.message) this.message = new Message(data.message, client);
         this.type = data.type;
-        this.member = new GuildMember(data.member ?? {} as any, this.guild, client);
-        this.user = new User(data.user ?? {} as any, client);
+        if (data.member) this.member = new GuildMember(data.member, this.guild, client);
+        if (data.user) this.user = new User(data.user, client);
         this.aplicationId = data.application_id;
     };
 
+    isCommand(): this is InteractionCommands {
+        return this.type == InteractionType.ApplicationCommand || this.type == InteractionType.ApplicationCommandAutocomplete;
+    };
+
+    isComponents(): this is (InteractionButton | InteractionSelectAny) {
+        return this.type == InteractionType.MessageComponent;
+    };
+
+    isModal(): this is InteractionModal {
+        return this.type == InteractionType.ModalSubmit;
+    };
 
     async reply(options: MessageInteractionOptions) {
         //@ts-ignore
-        const mData: MessageInteractionOptions = {
+        const data: MessageInteractionOptions = {
             content: undefined,
             embeds: undefined,
             components: undefined,
             flags: undefined,
         };
-        let data: { type: InteractionResponseType.ChannelMessageWithSource; data: MessageInteractionOptions; } | { files: RawFile[], body?: { type: InteractionResponseType.ChannelMessageWithSource; data: MessageInteractionOptions; } } | undefined = undefined;
+
+        let files: RawFile[] | undefined = undefined;
+        if(options.ephemeral) data.flags = MessageFlags.Ephemeral;
 
         if (typeof options === 'string') {
-            mData.content = options;
-            data = { type: InteractionResponseType.ChannelMessageWithSource, data: mData };
+            data.content = options;
         } else if (typeof options == "object") {
 
-            if (options.components && Array.isArray(options.components)) mData.components = options.components;
-            if (options.embeds && Array.isArray(options.embeds)) mData.embeds = options.embeds;
-            if (options.content) mData.content = options.content;
+            if (options.components && Array.isArray(options.components)) data.components = options.components;
+            if (options.embeds && Array.isArray(options.embeds)) data.embeds = options.embeds;
+            if (options.content) data.content = options.content;
+            if ( options.flags ) data.flags = data.flags ?? 0 | options.flags
 
             if (options.attachments) {
-                data = { files: [], body: undefined };
-
-                const from: RawFile[] = [];
+                files = [];
                 for (let i = 0; i < options.attachments.length; i++) {
                     const attach = options.attachments[i];
                     let contentType = ""
@@ -79,23 +93,17 @@ export class BasedInteraction extends BaseData {
                         };
                     } else { _buffer = attach.attachment as Buffer; name = attach.name ?? `default${i}.txt`; };
 
-                    if (_buffer) from.push({
+                    if (_buffer) files.push({
                         data: _buffer,
                         name,
                         contentType
                     });
                 };
 
-                data.body = { type: InteractionResponseType.ChannelMessageWithSource, data: mData };
-                data.files = from;
-
-            } else {
-                data = { type: InteractionResponseType.ChannelMessageWithSource, data: mData };
             };
         };
-
         //@ts-ignore
-        return await this.client.rest.post("interactionCallback", data, this.id, this.token);
+        return await this.client.rest.post("interactionCallback", { body: { type: InteractionResponseType.ChannelMessageWithSource, data: data }, files }, this.id, this.token);
     };
 
 

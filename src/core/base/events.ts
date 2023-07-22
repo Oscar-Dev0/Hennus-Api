@@ -1,4 +1,4 @@
-import { Channel, Guild, GuildMember, Message, Ready, User } from "../../types";
+import { Channel, Guild, GuildMember, Interaction, Message, Ready, User } from "../../types";
 import { Presence } from "../../types/events/Presence";
 
 export interface ListEvents {
@@ -25,7 +25,7 @@ export interface ListEvents {
     IntegrationCreate : [],
     IntegrationDelete : [],
     IntegrationUpdate : [],
-    InteractionCreate : [],
+    InteractionCreate : [ interaction: Interaction ],
     InviteCreate : [],
     InviteDelete : [],
     MessageCreate : [ message: Message ],

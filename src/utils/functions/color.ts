@@ -1,23 +1,18 @@
 import { HennusError, errorCodes } from "../../core/Error";
 
-export function resolvedColor(color: colorType) {
+export function resolvedColor(color: colorType): number {
     if (typeof color === 'string') {
         if (color === 'Random') return Math.floor(Math.random() * (0xffffff + 1));
         if (color === 'Default') return 0;
+        
         if (/^#?[\da-f]{6}$/i.test(color)) return parseInt(color.replace('#', ''), 16);
-    
+        
         const enumColorValue = Colors[color as StringColor];
-        if (enumColorValue !== undefined) {
-            color = enumColorValue;
-        } else {
-            throw new HennusError(errorCodes.ColorRange);
-        }
-    } else if (Array.isArray(color)) {
-        color = (color[0] << 16) + (color[1] << 8) + color[2];
-    };
+        if (enumColorValue !== undefined) color = enumColorValue; 
+        else throw new HennusError(errorCodes.ColorRange);
+    } else if (Array.isArray(color)) color = (color[0] << 16) + (color[1] << 8) + color[2];
 
-    if (typeof color == "number" && (color < 0 || color > 0xffffff)) throw new HennusError(errorCodes.ColorRange);
-    if (typeof color !== 'number' || Number.isNaN(color)) throw new HennusError(errorCodes.ColorConvert);
+    if (typeof color !== 'number' || Number.isNaN(color) || color < 0 || color > 0xffffff) throw new HennusError(errorCodes.ColorRange);
 
     return color;
 };

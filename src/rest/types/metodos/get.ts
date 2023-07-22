@@ -48,7 +48,7 @@ interface type<T extends keyof getOptions> {
 };
 
 export function GetRoutes<T extends keyof getOptions, D extends type<T>>( type: D["op"], ...args: D["d"] ): D["link"] {
-    Routes.guildRoles
+    Routes.interactionCallback
     const router = Routes[type];
     //@ts-ignore
     return router(...args) as D["link"];

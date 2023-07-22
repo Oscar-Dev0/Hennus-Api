@@ -48,5 +48,10 @@ export class BaseUser extends BaseData {
     // Method to convert the user data to JSON
     toJson() {
         return this.data;
-    }
-}
+    };
+
+    toString(){
+        if(this.id) return `<@${this.id}>`;
+        else return "";
+    };
+};

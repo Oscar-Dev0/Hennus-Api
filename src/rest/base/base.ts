@@ -18,9 +18,9 @@ export class baseRest extends BaseRestFunction {
         if (type == "channelMessages") {
             let msg: undefined | APIMessage = undefined;
             //@ts-ignore
-            if (args && args?.files && args.files[0]) msg = await super._post("channelMessages", { ...args }, ...data);
+            if (args && args?.files && args.files[0]) msg = await super._post("channelMessages", { ...args, headers: { "Content-Type": "multipart/form-data" } }, ...data);
             //@ts-ignore
-            else if (args && !args.attachment) msg = await super._post("channelMessages", { body: args, headers: { "Content-Type": "application/json" } }, ...data);
+            else if (args && !args.files) msg = await super._post("channelMessages", { body: args, headers: { "Content-Type": "application/json" } }, ...data);
             if (msg instanceof Error) throw msg;
             if (msg) return new Message(msg, this.client) as r;
         } else if (type == "applicationCommands") {
@@ -30,10 +30,11 @@ export class baseRest extends BaseRestFunction {
             if (cmd) return cmd as r;
         } else if (type == "interactionCallback") {
             let int: any | undefined = undefined;
+
             //@ts-ignore
-            if (args && args?.files && args.files[0]) msg = await super._post("interactionCallback", { ...args }, ...data);
+            if (args && args?.files && args.files[0]) int = await super._post("interactionCallback", { auth: false, ...args }, ...data);
             //@ts-ignore
-            if(args && !args.attachment) int = await super._post("interactionCallback", { body: args }, ...data);
+            if(args && !args?.files) int = await super._post("interactionCallback", { ...args }, ...data);
             if (int instanceof Error) throw int;
             if (int) return int as r;
         };

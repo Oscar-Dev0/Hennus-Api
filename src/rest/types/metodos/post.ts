@@ -36,6 +36,6 @@ export function postRoutes< T extends keyof postOptions,D extends postType<T>>(t
 
 export interface postNode {
     channelMessages: { return: Message, args: MessageChannelOptions | { files: RawFile[], body?: MessageChannelOptions }, data: postOptions["channelMessages"]};
-    interactionCallback: { return: any, args: interactionResponse | { files: RawFile[], body: { type: InteractionResponseType.ChannelMessageWithSource; data: MessageInteractionOptions; } }, data: postOptions['interactionCallback'] };
+    interactionCallback: { return: any, args:{ body: interactionResponse } | { files?: RawFile[], body: { type: InteractionResponseType.ChannelMessageWithSource; data: MessageInteractionOptions; } }, data: postOptions['interactionCallback'] };
     applicationCommands: { return: interactionResult, args: RESTPostAPIApplicationCommandsJSONBody , data: postOptions['applicationCommands'] }
 };

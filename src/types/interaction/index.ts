@@ -4,7 +4,8 @@ import { ModalBuilder } from "../../build";
 import { Permissions } from "../base/permissions";
 import { AddUndefinedToPossiblyUndefinedPropertiesOfInterface } from "discord-api-types/utils/internals"
 import { InteractionCommands } from "./commnads";
-import { ModalInteraction } from "./modal";
+import { InteractionModal } from "./modal";
+import { ComponentsInteraction } from "./componets";
 
 
 
@@ -32,4 +33,4 @@ export type interactionData = AddUndefinedToPossiblyUndefinedPropertiesOfInterfa
 export type interactionResult = RESTPostAPIApplicationCommandsResult;
 
 
-export type Interaction = InteractionCommands | ModalInteraction;
+export type Interaction = InteractionCommands | InteractionModal | ComponentsInteraction;

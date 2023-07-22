@@ -1,16 +1,28 @@
 import { APIPartialEmoji } from "discord-api-types/v10";
 
-export function decodeEmoji(text: string) {
+
+function decodeEmoji(text: string): APIPartialEmoji {
     if (text.includes('%')) text = decodeURIComponent(text);
-    if (!text.includes(':')) return { isAnimated: false, name: text, id: undefined };
+
+
+    if (!text.includes(':')) return { animated: undefined, name: text, id: null };
+
     const emojiMap = text.match(/<?(?:(a):)?(\w{2,32}):(\d{17,19})?>?/);
-    return emojiMap && { isAnimated: Boolean(emojiMap[1]), name: emojiMap[2], id: emojiMap[3] };
+    if (emojiMap) return { animated: Boolean(emojiMap[1]), name: emojiMap[2], id: emojiMap[3] };
+    return { animated: undefined, name: null, id: null }
 };
 
-export function resolvePartialEmoji(emoji: APIPartialEmoji | string) {
+function resolvePartialEmoji(emoji: APIPartialEmoji | string): APIPartialEmoji | null {
     if (!emoji) return null;
-    if (typeof emoji === 'string') return /^\d{17,19}$/.test(emoji) ? { id: emoji } : decodeEmoji(emoji);
+    if (typeof emoji === 'string') return /^\d{17,19}$/.test(emoji) ? { id: null, name: emoji } : decodeEmoji(emoji);
+
+
     const { id, name, animated } = emoji;
     if (!id && !name) return null;
+
+
     return { id, name, animated: Boolean(animated) };
-};
+}
+
+export { resolvePartialEmoji, decodeEmoji };
+

@@ -1,9 +1,12 @@
 import { WebSocketManager, WorkerShardingStrategy } from "@discordjs/ws";
 import { Client, } from "../core";
 import { REST } from "@discordjs/rest";
-import { ChannelType, GatewayDispatchEvents, GatewayDispatchPayload, GatewayIntentBits, GatewayReadyDispatchData } from "discord-api-types/v10";
-import { BasedCategoryChannel, BasedDmChannel, BasedForumChannel, BasedTextChannel, BasedThreadChannel, BasedVoiceChannel, Channel, Guild, GuildMember, Message, Ready, User } from "../types";
+import { ChannelType, ComponentType, GatewayDispatchEvents, GatewayDispatchPayload, GatewayIntentBits, GatewayReadyDispatchData, InteractionType } from "discord-api-types/v10";
+import { BasedCategoryChannel, BasedDmChannel, BasedForumChannel, BasedTextChannel, BasedThreadChannel, BasedVoiceChannel, Channel, Guild, GuildMember, Interaction, Message, Ready, User } from "../types";
 import { Presence } from "../types/events/Presence";
+import { InteractionModal } from "../types/interaction/modal";
+import { InteractionCommands } from "../types/interaction/commnads";
+import { InteractionButton, InteractionSelectAny } from "../types/interaction/componets";
 
 export class HennusWS extends WebSocketManager {
 
@@ -190,7 +193,16 @@ export class HennusWS extends WebSocketManager {
                 this.client.users.update(user);
             });
         } else if (data.t == GatewayDispatchEvents.InteractionCreate){
-            
+            let int: Interaction | undefined = undefined;
+            console.log(data.d.guild_id , data.d.channel?.id);
+            if(data.d.type  == InteractionType.ModalSubmit) int = new InteractionModal(data.d, this.client);
+            if(data.d.type == InteractionType.ApplicationCommand || data.d.type == InteractionType.ApplicationCommandAutocomplete) int = new InteractionCommands(data.d, this.client);
+            if(data.d.type == InteractionType.MessageComponent) {
+                if(data.d.data.component_type == ComponentType.Button) int = new InteractionButton(data.d, this.client);
+                else int = new InteractionSelectAny(data.d, this.client);
+            };
+
+            if(int) this.client.emit("InteractionCreate", int);
         };
     };
 

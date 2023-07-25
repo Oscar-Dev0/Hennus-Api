@@ -18,7 +18,7 @@ export interface UpdateTextAnnouncementChannel {
   topic?: string;
   nsfw?: boolean;
   rate_limit_per_user?: number;
-  permission_overwrites?: Overwriter[];
+  permission_overwrites?: Overwrite[];
   parent_id?: string;
   rtc_region?: string;
   default_auto_archive_duration?: number;
@@ -28,7 +28,7 @@ export interface UpdateTextAnnouncementChannel {
 export interface UpdateVoiceStageChannel {
   name?: string;
   position?: number;
-  permission_overwrites?: Overwriter[];
+  permission_overwrites?: Overwrite[];
   bitrate?: number;
   user_limit?: number;
   parent_id?: string;
@@ -40,7 +40,7 @@ export interface UpdateVoiceStageChannel {
 export interface UpdateForumChannel {
   name?: string;
   position?: number;
-  permission_overwrites?: Overwriter[];
+  permission_overwrites?: Overwrite[];
   topic?: string;
   nsfw?: boolean;
   rate_limit_per_user?: number;
@@ -82,4 +82,4 @@ export interface UpdateDMGrupChannel {
 export type UpdateChannel = UpdateDMGrupChannel | UpdateForumChannel | UpdateTextAnnouncementChannel | UpdateThreadChannel | UpdateVoiceStageChannel;
 
 
-type Overwriter = Omit<APIOverwrite, "allow" | "deny"> & { deny?: Permissions, allow?: Permissions };
+export type Overwrite = Omit<APIOverwrite, "allow" | "deny"> & { deny?: Permissions, allow?: Permissions };

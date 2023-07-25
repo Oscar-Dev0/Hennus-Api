@@ -10,6 +10,7 @@ import { RawFile } from "@discordjs/rest";
 import { InteractionCommands } from "../interaction/commnads";
 import { InteractionButton, InteractionSelectAny } from "../interaction/componets";
 import { InteractionModal } from "../interaction/modal";
+import { ModalBuilder } from "../../build";
 
 export class BasedInteraction extends BaseData {
 
@@ -104,6 +105,10 @@ export class BasedInteraction extends BaseData {
         };
         //@ts-ignore
         return await this.client.rest.post("interactionCallback", { body: { type: InteractionResponseType.ChannelMessageWithSource, data: data }, files }, this.id, this.token);
+    };
+
+    async respond(modal: ModalBuilder){
+        return await this.client.rest.post("interactionCallback", { body: { type: InteractionResponseType.Modal, data: modal } }, this.id, this.token)
     };
 
 

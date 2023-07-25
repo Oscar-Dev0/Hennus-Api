@@ -1,9 +1,10 @@
-import { APIMessage, GatewayMessageCreateDispatchData, GatewayMessageUpdateDispatchData, Snowflake } from "discord-api-types/v10";
+import { APIMessage, GatewayMessageCreateDispatchData, GatewayMessageUpdateDispatchData, Routes, Snowflake } from "discord-api-types/v10";
 import { Client } from "../../core";
 import { Guild, GuildMember } from "../guild";
 import { Channel } from "../channel";
 import { User } from "../user";
 import { EmbedBuilder } from "../../build";
+import { MessageChannelOptions } from "../message";
 
 export class Message {
 
@@ -86,6 +87,18 @@ export class Message {
 
     get toJson(){
         return this.message;
+    };
+
+    async delete(){
+        const data = await this.client.rest.api.delete(Routes.channelMessage(this.channelId, this.id));
+        if(data instanceof Error) throw data;
+        return data;
+    };
+
+    async edit(data: MessageChannelOptions){
+        const msg = await this.client.rest.api.delete(Routes.channelMessage(this.channelId, this.id), {body: data});
+        if(msg instanceof Error) throw msg;
+        return msg;
     };
     
 };

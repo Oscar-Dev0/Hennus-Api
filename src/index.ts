@@ -3,6 +3,5 @@ export * from "./rest";
 export * from "./core";
 export * from "./build";
 export * from './types';
-export * from "discord-api-types/v10";
-export * from "@discordjs/ws";
-export * from "@discordjs/ws";
+export { Snowflake, GatewayIntentBits, ActivityType } from "discord-api-types/v10"
+export { Collection } from "@discordjs/collection";

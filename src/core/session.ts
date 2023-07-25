@@ -8,8 +8,12 @@ import { WebSocketShardEvents } from "@discordjs/ws";
 import { ChannelsManager, GuildsManager, UsersManager } from "../utils";
 import { ClientUser } from "../types";
 import { commandsManger } from "./base/aplication";
+import { EmojisManager } from "../utils/manager/emojis";
 
 export class Client extends BaseClient {
+
+    private status = false;
+
     constructor(public options: Partial<ClientOptions>) {
         super();
         if (!options.token || options.token.length === 0) {
@@ -22,7 +26,8 @@ export class Client extends BaseClient {
         this.channels = new ChannelsManager(this);
         this.users = new UsersManager(this);
         this.guilds = new GuildsManager(this);
-        this.commands = new commandsManger(this);
+        this.aplication.commands = new commandsManger(this);
+        this.emojis = new EmojisManager(this);
     }
 
     async login() {
@@ -30,9 +35,14 @@ export class Client extends BaseClient {
             await this.wss.connect();
             this.wss.on(WebSocketShardEvents.Dispatch, ({ data }) => {
                 if (data.t === GatewayDispatchEvents.Ready) {
-                    ///@ts-ignore
-                    this.set(this, { user: data.d.user, aplicationid: data.d.application.id });
-                    this.wss.ready(data.d);
+                    if (!this.status) {
+                        this.status = true;
+                        Object.defineProperty(this, "user", { value: new ClientUser(data.d.user, this), configurable: true });
+                        Object.defineProperty(this, "id", { value: data.d.user.id, configurable: true });
+                        Object.defineProperty(this, "aplicationId", { value: data.d.application.id, configurable: true });
+
+                        this.wss.ready(data.d);
+                    };
                 } else {
                     this.wss.Handler(data);
                 }

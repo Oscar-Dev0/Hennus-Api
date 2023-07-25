@@ -22,18 +22,16 @@ interface postLink {
     applicationCommands: `/applications/${string}/commands`;
 };
 
-interface postType<T extends keyof postOptions>{
-    op: T;
-    d: postOptions[T];
-    link: postLink[T];
-};
 
-export function postRoutes< T extends keyof postOptions,D extends postType<T>>(type: D['op'], ...args: D["d"] ): D["link"]{
+export function postRoutes<T extends keyof postOptions>(
+    type: T,
+    ...args: postOptions[T]
+  ): postLink[T] {
     const router = Routes[type];
     //@ts-ignore
-    return router(...args) as D["link"];
-};
-
+    return router(...args) as postLink[T];
+  };
+  
 export interface postNode {
     channelMessages: { return: Message, args: MessageChannelOptions | { files: RawFile[], body?: MessageChannelOptions }, data: postOptions["channelMessages"]};
     interactionCallback: { return: any, args:{ body: interactionResponse } | { files?: RawFile[], body: { type: InteractionResponseType.ChannelMessageWithSource; data: MessageInteractionOptions; } }, data: postOptions['interactionCallback'] };

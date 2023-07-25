@@ -22,9 +22,16 @@ const client =  new Client(
 );
 
 client.on("Ready", (ready)=>{
-    console.log("Bot Prendido")
+    console.log("Bot Prendido");
+    client.aplication.commands.create({ name: "holas" description: "TestHola"});
 });
 
+client.on("InteractionCreate", (int)=>{
+
+    if(int.isCommand() && int.commandName == "hola"){
+        int.reply("Hola");
+    };
+});
 
 client.login();
 

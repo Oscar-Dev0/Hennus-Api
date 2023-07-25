@@ -21,8 +21,8 @@ export class BasedInteraction extends BaseData {
     public channel: Channel;
     public message?: Message;
     public type: InteractionType;
-    public member?: GuildMember;
-    public user?: User;
+    public member: GuildMember;
+    public user: User;
 
 
 
@@ -37,8 +37,8 @@ export class BasedInteraction extends BaseData {
         this.channel = this.client.channels.resolve(data.channel?.id ?? "") ?? {} as Channel;
         if (data.message) this.message = new Message(data.message, client);
         this.type = data.type;
-        if (data.member) this.member = new GuildMember(data.member, this.guild, client);
-        if (data.user) this.user = new User(data.user, client);
+        if (data.member) { this.member = new GuildMember(data.member, this.guild, client); if(this.member.user) this.user = this.member.user};
+        if (data.user) { this.user = new User(data.user, client); const member = this.guild.members.resolve(this.user.id); if(member) this.member = member };
         this.aplicationId = data.application_id;
     };
 

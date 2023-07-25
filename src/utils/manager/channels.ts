@@ -1,8 +1,11 @@
 import { Collection } from "@discordjs/collection";
-import { Channel } from "../../types";
+import { BasedCategoryChannel, BasedDmChannel, BasedForumChannel, BasedTextChannel, BasedThreadChannel, BasedVoiceChannel, Channel, UpdateChannel } from "../../types";
 import { cacheManager } from "./base";
 import { Client } from "../../core";
 import { Snowflake } from "discord-api-types/globals";
+import { APIChannel, APIGuildCreatePartialChannel, ChannelType, OverwriteType, RESTPostAPIGuildChannelJSONBody, Routes } from "discord-api-types/v10";
+import { Permissions } from "../../types/base/permissions";
+import { channelConvertidor } from "../functions";
 
 export class ChannelsManager extends cacheManager<string, Channel> {
     constructor(client: Client) {
@@ -42,5 +45,27 @@ export class ChannelsManager extends cacheManager<string, Channel> {
         });
         return this.cache;
     };
+
+    async create(guild_id: Snowflake, data: Omit<RESTPostAPIGuildChannelJSONBody, "permission_overwrites"> & { permission_overwrites?: Array<{ allow?: Permissions, deny?: Permissions, type: OverwriteType; }> }) {
+        const channel: APIChannel = await this.client.rest.api.post(Routes.guildChannels(guild_id), { body: data }) as any;
+        if(!channel) return undefined;
+        if(channel instanceof Error) throw channel;
+        return channelConvertidor(channel, this.client);
+    };
+
+    async delete(id: Snowflake) {
+        this.client.rest.api.delete(Routes.channel(id));
+        if (this.cache.has(id)) {
+            return this.resolve(id);
+        } else return undefined;
+    };
+
+    async edit(id: Snowflake, body: UpdateChannel){
+        const channel: APIChannel = await this.client.rest.api.patch(Routes.channel(id), { body }) as any;
+        if(!channel) return undefined;
+        if(channel instanceof Error) throw channel;
+        return channelConvertidor(channel, this.client);
+    };
+
 
 };

@@ -32,6 +32,9 @@ export class InteractionCommands extends BasedInteraction {
     ) {
         super(data, client);
         this.cmdData = data.data;
+        this.commandName = this.cmdData.name;
+        this.commandId = this.cmdData.id;
+        this.commandType = this.cmdData.type;
     };
 
     get options() {
@@ -107,6 +110,10 @@ export class InteractionCommands extends BasedInteraction {
         };
     
         return [] as any;
+    };
+    toString() {
+        if(this.commandName && this.commandId) return `</${this.commandName}:${this.commandId}>`;
+        else return "";
     };
     
 

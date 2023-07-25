@@ -23,4 +23,9 @@ export enum errorCodes {
     /* Commands */
     CommandNameUpperCase = "El nombre del comando no debe contener letras mayúsculas.",
     InvalidCommandNameLength = "El nombre del comando debe tener entre 1 y 32 caracteres.",
+
+    /* Channels */
+    ChannelNameLength = "El nombre del canal debe tener entre 1 y 100 caracteres.",
+    ChannelTopicLength = "El topic del canal debe tener entre 0 y 1024 caracteres.",
+
 }

@@ -14,7 +14,6 @@ export class baseRest extends BaseRestFunction {
     };
 
     async post<a extends keyof postNode, ar extends postNode[a]['args'], d extends postNode[a]['data'], r extends postNode[a]['return']>(type: a, args: ar, ...data: d): Promise<r | undefined> {
-        data
         if (type == "channelMessages") {
             let msg: undefined | APIMessage = undefined;
             //@ts-ignore
@@ -108,6 +107,7 @@ export class baseRest extends BaseRestFunction {
         };
         return undefined;
     };
+
 };
 
 

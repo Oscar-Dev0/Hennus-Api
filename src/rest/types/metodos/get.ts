@@ -41,13 +41,8 @@ interface getLink {
 
 
 
-interface type<T extends keyof getOptions> {
-    op: T;
-    d: getOptions[T];
-    link: getLink[T];
-};
 
-export function GetRoutes<T extends keyof getOptions, D extends type<T>>( type: D["op"], ...args: D["d"] ): D["link"] {
+export function GetRoutes<T extends keyof getOptions>( type:T , ...args: getOptions[T] ): getLink[T] {
     Routes.interactionCallback
     const router = Routes[type];
     //@ts-ignore

@@ -27,8 +27,8 @@ export type interactionResponse =
 { type: InteractionResponseType.Modal, data: ModalBuilder };
 
 export type interactionData = AddUndefinedToPossiblyUndefinedPropertiesOfInterface<Omit<RESTPostAPIApplicationCommandsJSONBody, "default_member_permissions"> &
-({ default_member_permissions: Permissions } |
-{ default_member_permissions: Permissions[] })>;
+({ default_member_permissions?: Permissions } |
+{ default_member_permissions?: Permissions[] })>;
 
 export type interactionResult = RESTPostAPIApplicationCommandsResult;
 

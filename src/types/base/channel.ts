@@ -1,4 +1,4 @@
-import { APIChannel, ChannelType } from "discord-api-types/v10";
+import { APIChannel, ChannelType, Routes } from "discord-api-types/v10";
 import { DiscordSnowflake } from "@sapphire/snowflake"
 import { BasedCategoryChannel, BasedDmChannel, BasedForumChannel, BasedTextChannel, BasedThreadChannel, BasedVoiceChannel } from "../channel";
 import { Client } from "../../core";
@@ -37,8 +37,9 @@ export class BaseChannel extends BaseData {
     };
 
     async delete() {
-        return await this.client.rest;
-    }
+        await this.client.rest.api.delete(Routes.channel(this.id));
+        return this;
+    };
 
     isChannelText(): this is BasedTextChannel {
         if (this.type == ChannelType.GuildAnnouncement || this.type == ChannelType.GuildText) return true;
@@ -127,6 +128,11 @@ export class BaseChannel extends BaseData {
 
         //@ts-ignore
         return await this.client.rest.post("channelMessages", data, id);
+    };
+
+    toString() {
+        if (this.id) return `<@#${this.id}>`;
+        else return "";
     };
 
 };

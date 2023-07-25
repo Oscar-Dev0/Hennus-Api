@@ -26,6 +26,7 @@ export class HennusRest{
 
     async get<a extends keyof getNode, d extends getNode[a]["data"], r extends getNode[a]["return"]>(type: a, ...data: d): Promise<r | undefined> {
         //@ts-ignore
-        return await this._rest.get(type, ...data)
+        return await this._rest.get(type, ...data);
     };
+
 };

@@ -8,6 +8,7 @@ import { HennusWS } from "../../ws";
 import { commandsManger } from "./aplication";
 import { APIUser } from "discord-api-types/v10";
 import { Client } from "../session";
+import { EmojisManager } from "../../utils/manager/emojis";
 
 export class BaseClient extends EventEmitter2 {
 
@@ -19,12 +20,17 @@ export class BaseClient extends EventEmitter2 {
 
     id: Snowflake;
     token: string;
+    intents = new IntentsBitField();
     user: ClientUser;
+
+    //Collections
     guilds: GuildsManager;
     channels: ChannelsManager;
     users: UsersManager;
-    intents = new IntentsBitField();
-    commands: commandsManger;
+    emojis: EmojisManager;
+
+    //@ts-ignore
+    aplication: { commands: commandsManger } = {};
     aplicationId: Snowflake;
     rest: HennusRest;
     wss: HennusWS;
@@ -42,11 +48,4 @@ export class BaseClient extends EventEmitter2 {
         return super.emit(event, ...args);
     };
 
-    private set(client: Client,  data: { user?: APIUser, aplicationid?: string }){
-        if(data.user){
-            Object.defineProperty(this, "user", {value: new ClientUser(data.user, client)});
-            Object.defineProperty(this, "id", { value: data.user.id });
-        };
-        if (data?.aplicationid && typeof data.aplicationid ==='string') Object.defineProperty(this, "aplicationId", { value: data.aplicationid })
-    };
 };

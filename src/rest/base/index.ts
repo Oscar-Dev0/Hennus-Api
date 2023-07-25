@@ -26,5 +26,6 @@ export class BaseRestFunction {
         return data as postReturn[T];
     };
 
+
 };
 

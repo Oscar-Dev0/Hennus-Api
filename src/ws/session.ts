@@ -1,12 +1,14 @@
 import { WebSocketManager, WorkerShardingStrategy } from "@discordjs/ws";
 import { Client, } from "../core";
 import { REST } from "@discordjs/rest";
-import { ChannelType, ComponentType, GatewayDispatchEvents, GatewayDispatchPayload, GatewayIntentBits, GatewayReadyDispatchData, InteractionType } from "discord-api-types/v10";
-import { BasedCategoryChannel, BasedDmChannel, BasedForumChannel, BasedTextChannel, BasedThreadChannel, BasedVoiceChannel, Channel, Guild, GuildMember, Interaction, Message, Ready, User } from "../types";
+import { ComponentType, GatewayDispatchEvents, GatewayDispatchPayload, GatewayIntentBits, GatewayReadyDispatchData, GatewaySendPayload, InteractionType } from "discord-api-types/v10";
+import { Guild, GuildMember, Interaction, Message, Ready, User, GuildEmojis} from "../types";
 import { Presence } from "../types/events/Presence";
 import { InteractionModal } from "../types/interaction/modal";
 import { InteractionCommands } from "../types/interaction/commnads";
 import { InteractionButton, InteractionSelectAny } from "../types/interaction/componets";
+import { channelConvertidor } from "../utils";
+
 
 export class HennusWS extends WebSocketManager {
 
@@ -18,10 +20,11 @@ export class HennusWS extends WebSocketManager {
             token: client.token,
             intents: client.intents.bitfield,
             rest,
-            buildStrategy: (manager) => new WorkerShardingStrategy(manager, { shardsPerWorker: 'all' }),
+            buildStrategy: (manager) => new WorkerShardingStrategy(manager, { shardsPerWorker: "all" }),
             shardCount: client.options.sharCount,
-            shardIds: client.options.shardIds
+            shardIds: client.options.shardIds,
         });
+
         Object.defineProperty(this, "client", {
             value: client,
         });
@@ -29,16 +32,15 @@ export class HennusWS extends WebSocketManager {
 
 
     async Handler(data: GatewayDispatchPayload) {
-        if (data.t != GatewayDispatchEvents.PresenceUpdate) console.log(data.t);
         if (data.t == GatewayDispatchEvents.GuildCreate) {
             //Cargando todo.
             const guild = new Guild(data.d, this.client);
             guild.memberCount = data.d.member_count;
             guild.roles.setall(data.d.roles);
-            const channels: any = [...data.d.channels, ...data.d.threads].map((channel) => { let ch: Channel | undefined = undefined; if (channel.type == ChannelType.GuildText || channel.type == ChannelType.GuildAnnouncement) ch = new BasedTextChannel(channel, this.client); else if (channel.type == ChannelType.DM || channel.type == ChannelType.GroupDM) ch = new BasedDmChannel(channel, this.client); else if (channel.type == ChannelType.GuildVoice || channel.type == ChannelType.GuildStageVoice) ch = new BasedVoiceChannel(channel, this.client); else if (channel.type == ChannelType.GuildCategory) ch = new BasedCategoryChannel(channel, this.client); else if (channel.type == ChannelType.GuildForum) ch = new BasedForumChannel(channel, this.client); else if (channel.type == ChannelType.PublicThread || channel.type == ChannelType.PrivateThread || channel.type == ChannelType.AnnouncementThread) ch = new BasedThreadChannel(channel, this.client); return ch; }).filter((x) => x !== undefined);
+            const channels: any = [...data.d.channels, ...data.d.threads].map((channel) => {return channelConvertidor(channel, this.client)}).filter((x) => x !== undefined);
             this.client.channels.setall(channels);
             guild.members.setall(data.d.members, guild);
-
+            this.client.emojis.setall(data.d.emojis.map((x)=> new GuildEmojis(x, guild, this.client)));
             const cache = this.client.guilds.cache.get(guild.id);
             if (!cache) this.client.guilds.cache.set(guild.id, guild);
 
@@ -62,14 +64,7 @@ export class HennusWS extends WebSocketManager {
                 this.client.guilds.cache.delete(cache.id);
             };
         } else if (data.t == GatewayDispatchEvents.ChannelCreate || data.t == GatewayDispatchEvents.ChannelUpdate || data.t == GatewayDispatchEvents.ChannelDelete) {
-            let channel: Channel | undefined = undefined;
-
-            if (data.d.type == ChannelType.GuildText || data.d.type == ChannelType.GuildAnnouncement) channel = new BasedTextChannel(data.d, this.client);
-            else if (data.d.type == ChannelType.DM || data.d.type == ChannelType.GroupDM) channel = new BasedDmChannel(data.d, this.client);
-            else if (data.d.type == ChannelType.GuildVoice || data.d.type == ChannelType.GuildStageVoice) channel = new BasedVoiceChannel(data.d, this.client);
-            else if (data.d.type == ChannelType.GuildCategory) channel = new BasedCategoryChannel(data.d, this.client);
-            else if (data.d.type == ChannelType.GuildForum) channel = new BasedForumChannel(data.d, this.client);
-            else if (data.d.type == ChannelType.PublicThread || data.d.type == ChannelType.PrivateThread || data.d.type == ChannelType.AnnouncementThread) channel = new BasedThreadChannel(data.d, this.client);
+            let channel = channelConvertidor(data.d, this.client);
 
             if (channel) {
                 const cache = this.client.channels.cache.get(channel.id);
@@ -194,7 +189,6 @@ export class HennusWS extends WebSocketManager {
             });
         } else if (data.t == GatewayDispatchEvents.InteractionCreate){
             let int: Interaction | undefined = undefined;
-            console.log(data.d.guild_id , data.d.channel?.id);
             if(data.d.type  == InteractionType.ModalSubmit) int = new InteractionModal(data.d, this.client);
             if(data.d.type == InteractionType.ApplicationCommand || data.d.type == InteractionType.ApplicationCommandAutocomplete) int = new InteractionCommands(data.d, this.client);
             if(data.d.type == InteractionType.MessageComponent) {
@@ -214,7 +208,7 @@ export class HennusWS extends WebSocketManager {
         if (!this.client.intents.has(GatewayIntentBits.Guilds)) {
 
             for (let index = 0; index < data.guilds.length; index++) {
-                if (index > 20) continue;
+                if (index > 5) continue;
                 const element = data.guilds[index];
                 const channels = await this.client.rest.get("guildChannels", element.id);
                 let guild;
@@ -231,5 +225,9 @@ export class HennusWS extends WebSocketManager {
 
             };
         };
+    };
+
+    async sendall(packet: GatewaySendPayload){
+        for (const shardId of await this.getShardIds()) this.send(shardId, packet);
     };
 };

@@ -1,10 +1,11 @@
-// Import required types and classes
 import { APINewsChannel, APITextChannel } from "discord-api-types/v10";
 import { BaseChannel } from "../base/channel";
 import { Client } from "../../core";
 import { Guild } from "../guild";
 import { MessagesManager } from "../../utils";
 import { channelFlags, OverwriteBitField } from "../bitfield";
+import { UpdateTextAnnouncementChannel } from ".";
+import { HennusError, errorCodes } from "../../core/Error";
 
 export class BasedTextChannel extends BaseChannel {
     public topic: string = "";
@@ -18,13 +19,11 @@ export class BasedTextChannel extends BaseChannel {
     private _cache_messages: MessagesManager;
 
     constructor(private data: APITextChannel | APINewsChannel, client: Client) {
-        // Call the constructor of the parent class (BaseChannel)
+
         super(data, client);
 
-        // Set the values of the properties using the "data" parameter passed to the constructor
         Object.defineProperty(this, "data", { value: data });
 
-        // Set additional properties
         this.topic = this.data.topic ?? "";
         this.nsfw = this.data.nsfw ?? false;
         this.permission = (this.data.permission_overwrites ?? []).map(({ id, type, deny, allow }) => ({
@@ -42,20 +41,24 @@ export class BasedTextChannel extends BaseChannel {
 
         this.lastMessage = this.data.last_message_id ?? undefined;
 
-        // Create MessagesManager instance
+
         this._cache_messages = new MessagesManager(this.client);
     }
 
-    // Getters to fetch all messages in the channel
+
     get messages() {
         this._cache_messages.fetchall(this.id);
         return this._cache_messages;
-    }
+    };
 
-    // Method to convert the channel data to JSON
+
     toJson() {
         return this.data;
-    }
+    };
 
-
-}
+    async edit(data: UpdateTextAnnouncementChannel){
+        if (data.name && (data.name.length >= 1 && data.name.length <= 100)) throw new HennusError(errorCodes.ChannelNameLength);
+        if (data.topic && (data.topic.length < 0 || data.topic.length > 1024)) throw new HennusError(errorCodes.ChannelTopicLength);
+        return await this.client.channels.edit(this.id, data) as BasedTextChannel;
+    };
+};

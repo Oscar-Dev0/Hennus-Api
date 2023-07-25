@@ -1,13 +1,13 @@
-// Import required types and classes
-import { APIGuild, GatewayGuildCreateDispatchData } from "discord-api-types/v10";
+import { APIGuild } from "discord-api-types/v10";
 import { BaseData } from "../base/data";
 import { Client } from "../../core";
 import { ImageURLOptions } from "@discordjs/rest";
 import { MembersManager, RolesManager } from "../../utils";
+import { GuildChannelsManager } from "../../utils/manager/GuildChannels";
 
-// Declare the class
+
 export class Guild extends BaseData {
-    // Properties of the class based on the APIGuild data
+
     public id: string = "";
     public name: string;
     public description: string | undefined;
@@ -16,11 +16,10 @@ export class Guild extends BaseData {
     public memberCount: number = 0;
 
     constructor(private data: APIGuild, client: Client) {
-        // Call the constructor of the parent class (BaseData)
+
         super(client);
 
-        // Set the values of the properties using the "data" parameter passed to the constructor
-        Object.defineProperty(this, "data", { value: data });
+         Object.defineProperty(this, "data", { value: data });
         this.id = data.id;
         this.name = data.name;
         this.description = data.description ?? undefined;
@@ -29,35 +28,42 @@ export class Guild extends BaseData {
         this.banner = data.banner ?? undefined;
     }
 
-    // Method to get the channels of the guild
-    public get channels() {
-        return this.client.channels.search(this.id);
-    }
 
-    // Create a MembersManager instance to work with members of the guild
+    public get channels() {
+        const datas =  this.client.channels.search(this.id);
+        const collect = new GuildChannelsManager(this.client, this);
+        collect.cache.concat(datas);
+        return collect;
+    };
+
+    public get emojis(){
+        return this.client.emojis.search(this.id);
+    };
+
+
     public members = new MembersManager(this.client, this.id);
 
-    // Create a RolesManager instance to work with roles of the guild
+
     public roles = new RolesManager(this.client);
 
-    // Method to get the URL for the guild's icon
+
     iconURL(options?: ImageURLOptions) {
         if (!this.icon) return undefined;
         return this.cdn.icon(this.id, this.icon, options);
     }
 
-    // Method to get the URL for the guild's banner
+
     bannerURL(options?: ImageURLOptions) {
         if (!this.banner) return undefined;
         return this.cdn.banner(this.id, this.banner, options);
     }
 
-    // Method to convert the guild data to JSON
+
     toJson() {
         return this.data;
     }
 
-    // Private method to patch (update) the guild data
+
     private _patch(data: APIGuild) {
         if (data.name != this.data.name) this.name = data.name;
         if (data.description != this.data.description) this.description = data.description ?? undefined;
@@ -66,13 +72,18 @@ export class Guild extends BaseData {
         if (data.approximate_member_count != this.data.approximate_member_count)
             this.memberCount = data.approximate_member_count ?? 0;
 
-        // Update the "data" property if the new data differs from the current data
+
         if (this.data != data) Object.defineProperty(this, "data", { value: data });
 
         return this;
-    }
+    };
+    toString() {
+        if (this.id) return `<@&${this.id}>`;
+        else return "";
+    };
 }
 
-// Export other related classes
+
 export * from "./Member";
 export * from "./roles";
+export * from "./emojis";

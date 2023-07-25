@@ -46,7 +46,7 @@ export class ChannelsManager extends cacheManager<string, Channel> {
         return this.cache;
     };
 
-    async create(guild_id: Snowflake, data: Omit<RESTPostAPIGuildChannelJSONBody, "permission_overwrites"> & { permission_overwrites?: Array<{ allow?: Permissions, deny?: Permissions, type: OverwriteType; }> }) {
+    async create_guild(guild_id: Snowflake, data: Omit<RESTPostAPIGuildChannelJSONBody, "permission_overwrites"> & { permission_overwrites?: Array<{ allow?: Permissions, deny?: Permissions, type: OverwriteType; }> }) {
         const channel: APIChannel = await this.client.rest.api.post(Routes.guildChannels(guild_id), { body: data }) as any;
         if(!channel) return undefined;
         if(channel instanceof Error) throw channel;

@@ -5,13 +5,13 @@ import { Permissions } from "../base/permissions";
 import { AddUndefinedToPossiblyUndefinedPropertiesOfInterface } from "discord-api-types/utils/internals"
 import { InteractionCommands } from "./commnads";
 import { InteractionModal } from "./modal";
-import { ComponentsInteraction } from "./componets";
+import { ComponentsInteraction, InteractionButton, InteractionSelectAny } from "./componets";
 
 
 
 
 
-
+export { ComponentsInteraction, InteractionButton, InteractionSelectAny, InteractionCommands, InteractionModal };
 
 
 
@@ -26,9 +26,9 @@ export type interactionResponse =
 { type: InteractionResponseType.ApplicationCommandAutocompleteResult, data: APICommandAutocompleteInteractionResponseCallbackData } |
 { type: InteractionResponseType.Modal, data: ModalBuilder };
 
-export type interactionData = AddUndefinedToPossiblyUndefinedPropertiesOfInterface<Omit<RESTPostAPIApplicationCommandsJSONBody, "default_member_permissions"> &
+export type interactionData = Omit<RESTPostAPIApplicationCommandsJSONBody, "default_member_permissions"> &
 ({ default_member_permissions?: Permissions } |
-{ default_member_permissions?: Permissions[] })>;
+{ default_member_permissions?: Permissions[] }) & { description : string};
 
 export type interactionResult = RESTPostAPIApplicationCommandsResult;
 

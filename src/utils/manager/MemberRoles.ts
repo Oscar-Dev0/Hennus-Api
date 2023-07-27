@@ -3,6 +3,7 @@ import { GuildMember, GuildRoles } from "../../types";
 import { cacheManager } from "./base";
 import { Client } from "../../core";
 import { Routes } from "discord-api-types/v10";
+import { ReadonlyCollection } from "@discordjs/collection";
 
 export class MemberRolesManager extends cacheManager<Snowflake, GuildRoles> {
     constructor(client: Client, guildId: Snowflake,memberId: Snowflake){
@@ -31,5 +32,13 @@ export class MemberRolesManager extends cacheManager<Snowflake, GuildRoles> {
         this.guild.members.add(data);
         //@ts-ignore
         return new GuildMember(data, this.guild, this.client);
+    };
+
+
+    public setall(roles: GuildRoles[]){
+        for (const role of roles){
+            if(!this.resolve(role)) this.cache.set(role.id, role);
+        };
+        return this;
     };
 };

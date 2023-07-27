@@ -85,6 +85,10 @@ export class Message {
         };
     };
 
+    get components(){
+        return this.message.components ?? [];
+    };
+
     get toJson(){
         return this.message;
     };
@@ -96,7 +100,13 @@ export class Message {
     };
 
     async edit(data: MessageChannelOptions){
-        const msg = await this.client.rest.api.delete(Routes.channelMessage(this.channelId, this.id), {body: data});
+        const msg = await this.client.rest.api.patch(Routes.channelMessage(this.channelId, this.id), {body: data});
+        if(msg instanceof Error) throw msg;
+        return msg;
+    };
+
+    async ping(){
+        const msg = await this.client.rest.api.put(Routes.channelPin(this.channelId, this.id));
         if(msg instanceof Error) throw msg;
         return msg;
     };

@@ -11,7 +11,9 @@ export class EmojisManager extends cacheManager<Snowflake, GuildEmojis> {
 
     setall(emojis: GuildEmojis[]){
         if (emojis && Array.isArray(emojis)) {
-            emojis.forEach((emoji) => { if (emoji) this.cache.set(emoji.id ?? emoji.name, emoji); });
+            for(const emoji of emojis){
+                if (emoji) this.cache.set(emoji.id ?? emoji.name, emoji);
+            };
             return true;
         } else {
             return false;

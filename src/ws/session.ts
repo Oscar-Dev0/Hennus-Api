@@ -1,7 +1,7 @@
 import { WebSocketManager, WorkerShardingStrategy } from "@discordjs/ws";
 import { Client, } from "../core";
 import { REST } from "@discordjs/rest";
-import { ComponentType, GatewayDispatchEvents, GatewayDispatchPayload, GatewayIntentBits, GatewayReadyDispatchData, GatewaySendPayload, InteractionType } from "discord-api-types/v10";
+import { ChannelType, ComponentType, GatewayDispatchEvents, GatewayDispatchPayload, GatewayIntentBits, GatewayReadyDispatchData, GatewaySendPayload, InteractionType } from "discord-api-types/v10";
 import { Guild, GuildMember, Interaction, Message, Ready, User, GuildEmojis} from "../types";
 import { Presence } from "../types/events/Presence";
 import { InteractionModal } from "../types/interaction/modal";
@@ -69,6 +69,7 @@ export class HennusWS extends WebSocketManager {
             if (channel) {
                 const cache = this.client.channels.cache.get(channel.id);
                 if (data.t == GatewayDispatchEvents.ChannelCreate) {
+                    !channel.isChannelCategory()? channel.messages : undefined;
                     this.client.channels.cache.set(channel.id, channel);
                     this.client.emit('ChannelCreate', channel);
                 };
@@ -78,7 +79,7 @@ export class HennusWS extends WebSocketManager {
                 };
                 if (data.t == GatewayDispatchEvents.ChannelUpdate) {
 
-                    if (!cache) this.client.channels.cache.set(channel.id, channel);
+                    if (!cache){ !channel.isChannelCategory()? channel.messages : undefined; this.client.channels.cache.set(channel.id, channel); }
                     else {
                         //@ts-ignore
                         cache.data = channel.data;

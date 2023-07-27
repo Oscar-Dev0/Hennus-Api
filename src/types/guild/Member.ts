@@ -11,11 +11,11 @@ import { MemberRolesManager } from "../../utils";
 
 export class GuildMember extends BaseData {
 
+    public guild: Guild;
     public user: User | undefined;
     public nick: string | undefined;
     public avatar: string | undefined;
     private _roles: string[];
-    public roles: MemberRolesManager;
     public joinedTimestamp: string | undefined;
     public premiumSinceTimestamp: string | undefined;
     public deaf: boolean;
@@ -24,7 +24,7 @@ export class GuildMember extends BaseData {
     public pending: boolean;
     public communicationDisabledUntilTimestamp: string | undefined;
 
-    constructor(private member: APIGuildMember, private guild: Guild, client: Client) {
+    constructor(private member: APIGuildMember,  guild: Guild, client: Client) {
 
         super(client);
 
@@ -37,8 +37,7 @@ export class GuildMember extends BaseData {
         this.nick = member.nick ?? undefined;
         this.avatar = member.avatar ?? undefined;
         this._roles = member.roles;
-        this.roles = new MemberRolesManager(client, guild.id, this.user?.id ?? '');
-        this.roles.cache.concat(this.guild.roles.searchlist(this._roles));
+
         this.joinedTimestamp = member.joined_at;
         this.premiumSinceTimestamp = member.premium_since ?? undefined;
         this.deaf = member.deaf;
@@ -46,7 +45,14 @@ export class GuildMember extends BaseData {
         this.flags = new MemberFlags(member.flags);
         this.pending = member.pending ?? false;
         this.communicationDisabledUntilTimestamp = member.communication_disabled_until ?? undefined;
-    }
+    };
+
+    get roles(){
+        const roles = new MemberRolesManager(this.client, this.guild.id, this.user?.id ?? '');
+        const map = this.guild.roles.searchlist(this._roles);
+        roles.setall(map);
+        return roles;
+    };
 
 
     avatarURL(options: ImageURLOptions) {

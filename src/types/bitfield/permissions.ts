@@ -3,10 +3,10 @@ import { BitField, BitFieldResolvable, PermissionsString } from ".";
 import { Permissions } from "../base/permissions"
 
 
-export class PermissionsBitField extends BitField<PermissionsString> {
+export class PermissionsBitField extends BitField<PermissionsString, Permissions> {
     public declare Flags: typeof Permissions;
     
-    public static All = Object.values(PermissionFlagsBits).reduce((all, p) => all | p, BigInt(0));
+    public static All = Object.values(PermissionFlagsBits).reduce((all, p) => BigInt(all) | BigInt(p), BigInt(0));
 
     public override resolve(bit?: BitFieldResolvable<PermissionsString, number>): number {
       //@ts-ignore 

@@ -38,23 +38,22 @@ export class InteractionCommands extends BasedInteraction {
     };
 
     get options() {
-        const data = this.find;
         return {
-            attachment: (name: string) => data(name, "attachment"),
-            boolean: (name: string) => data(name, "boolean"),
-            channel: (name: string) => data(name, "channel"),
-            integer: (name: string) => data(name, "integer"),
-            mentionable: (name: string) => data(name, "mentionable"),
-            number: (name: string) => data(name, "number"),
-            role: (name: string) => data(name, "role"),
-            string: (name: string) => data(name, "string"),
-            subCommand: (name: string) => data(name, "subcommand"),
-            subCommandGroup: (name: string) => data(name, "subcommandGroup"),
-            user: (name: string) => data(name, "user"),
+            attachment: (name: string) => this.find("attachment", name),
+            boolean: (name: string) => this.find("boolean",name),
+            channel: (name: string) => this.find("channel", name),
+            integer: (name: string) => this.find("integer", name),
+            mentionable: (name: string) => this.find("mentionable", name),
+            number: (name: string) => this.find("number", name),
+            role: (name: string) => this.find("role", name),
+            string: (name: string) => this.find("string", name),
+            subCommand: this.find("subcommand"),
+            subCommandGroup: this.find("subcommandGroup"),
+            user: (name: string) => this.find("user", name),
         };
     };
     
-    private find<T extends options["type"]>(find: string, type: T): Extract<options, { type: T }>["return"] {
+    private find<T extends options["type"]>(type: T, find?: string): Extract<options, { type: T }>["return"] {
         const typeMapping: { [K in options["type"]]: ApplicationCommandOptionType } = {
             number: ApplicationCommandOptionType.Number,
             integer: ApplicationCommandOptionType.Integer,
@@ -69,15 +68,13 @@ export class InteractionCommands extends BasedInteraction {
             subcommandGroup: ApplicationCommandOptionType.SubcommandGroup
         };
     
-        if (type === "subcommandGroup" || type === "subcommand") {
-            //@ts-ignore
-            return this.datas(typeMapping[type]) as any;
-        };
+        if (type === "subcommandGroup") return this.datas("subcommandGroup") as any
+        else if(type === "subcommand") return (this.datas("subcommand") ?? []) as any;
     
         const data = this.datas("null") ?? [];
         const finds = data.find((s) => s.name === find);
     
-        if (!type || !finds || finds.type !== typeMapping[type]) return {} as any;
+        if (!type || !finds || finds.type !== typeMapping[type]) return undefined as any;
         
     
         if (type === "channel") {
@@ -100,16 +97,14 @@ export class InteractionCommands extends BasedInteraction {
         let datos = data.options ?? [];
     
         if (datos[0].type === ApplicationCommandOptionType.SubcommandGroup) {
-            if (datos[0].type === type) return [datos[0].name, datos[0].options] as any;
+            if (type === "subcommandGroup") return [datos[0].name, datos[0].options] as any;
             datos = datos[0].options;
-        };
-    
+        }; 
         if (datos[0].type === ApplicationCommandOptionType.Subcommand) {
-            if (datos[0].type === type) return [datos[0].name, datos[0].options ?? []] as any;
+            if (type === "subcommand") return [datos[0].name, datos[0].options ?? []] as any;
             return (datos[0].options ?? []) as any;
         };
-    
-        return [] as any;
+        return datos as any;
     };
     toString() {
         if(this.commandName && this.commandId) return `</${this.commandName}:${this.commandId}>`;
@@ -134,12 +129,12 @@ type options =
 type datas = subcommand | subcommandGroup | gruponull;
 
 interface subcommand {
-    type: ApplicationCommandOptionType.Subcommand;
+    type: "subcommand";
     return: [name: string, options: APIApplicationCommandInteractionDataBasicOption[]];
 }
 
 interface subcommandGroup {
-    type: ApplicationCommandOptionType.SubcommandGroup;
+    type: "subcommandGroup";
     return: [name: string, options: APIApplicationCommandInteractionDataSubcommandOption[]];
 }
 

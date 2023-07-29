@@ -38,8 +38,8 @@ export class BasedInteraction extends BaseData {
         this.channel = this.client.channels.resolve(data.channel?.id ?? "") ?? {} as Channel;
         if (data.message) this.message = new Message(data.message, client);
         this.type = data.type;
-        if (data.member) { this.member = new GuildMember(data.member, this.guild, client); if(this.member.user) this.user = this.member.user};
-        if (data.user) { this.user = new User(data.user, client); const member = this.guild.members.resolve(this.user.id); if(member) this.member = member };
+        if (data.member) { this.member = new GuildMember(data.member, this.guild, client); if (this.member.user) this.user = this.member.user };
+        if (data.user) { this.user = new User(data.user, client); const member = this.guild.members.resolve(this.user.id); if (member) this.member = member };
         this.aplicationId = data.application_id;
     };
 
@@ -55,7 +55,7 @@ export class BasedInteraction extends BaseData {
         return this.type == InteractionType.ModalSubmit;
     };
 
-    async reply(options: MessageInteractionOptions) {
+    async reply(options: MessageInteractionOptions | string) {
         //@ts-ignore
         const data: MessageInteractionOptions = {
             content: undefined,
@@ -65,7 +65,7 @@ export class BasedInteraction extends BaseData {
         };
 
         let files: RawFile[] | undefined = undefined;
-        if(options.ephemeral) data.flags = MessageFlags.Ephemeral;
+
 
         if (typeof options === 'string') {
             data.content = options;
@@ -74,7 +74,9 @@ export class BasedInteraction extends BaseData {
             if (options.components && Array.isArray(options.components)) data.components = options.components;
             if (options.embeds && Array.isArray(options.embeds)) data.embeds = options.embeds;
             if (options.content) data.content = options.content;
-            if ( options.flags ) data.flags = data.flags ?? 0 | options.flags
+            if (options.ephemeral) data.flags = MessageFlags.Ephemeral;
+            if (options.flags) data.flags = data.flags ?? 0 | options.flags;
+
 
             if (options.attachments) {
                 files = [];
@@ -104,10 +106,16 @@ export class BasedInteraction extends BaseData {
             };
         };
         //@ts-ignore
-        return await this.client.rest.post("interactionCallback", { body: { type: InteractionResponseType.ChannelMessageWithSource, data: data }, files }, this.id, this.token);
+        const msg = await this.client.rest.post("interactionCallback", { body: { type: InteractionResponseType.ChannelMessageWithSource, data: data }, files }, this.id, this.token);
+
+        if (msg instanceof Error) throw msg;
+
+        if (typeof options == "object" && typeof options.timeout == "number") setTimeout(async () => { try { await this.client.rest.api.delete(Routes.webhookMessage(this.client.id, this.token, "@original")); } catch { undefined }; }, options.timeout);
+
+        return msg;
     };
 
-    async respond(modal: ModalBuilder){
+    async respond(modal: ModalBuilder) {
         return await this.client.rest.post("interactionCallback", { body: { type: InteractionResponseType.Modal, data: modal } }, this.id, this.token)
     };
 

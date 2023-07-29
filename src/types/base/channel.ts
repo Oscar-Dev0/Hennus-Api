@@ -127,7 +127,13 @@ export class BaseChannel extends BaseData {
         };
 
         //@ts-ignore
-        return await this.client.rest.post("channelMessages", data, id);
+        const msg = await this.client.rest.post("channelMessages", data, id);
+
+        if(msg instanceof Error) throw msg;
+
+        if(msg && typeof options == "object" && typeof options.timeout == "number") setTimeout(()=> msg.delete().catch(()=>undefined), options.timeout);
+        
+        return msg;
     };
 
     toString() {

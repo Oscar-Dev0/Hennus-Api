@@ -16,7 +16,7 @@ export class MemberRolesManager extends cacheManager<Snowflake, GuildRoles> {
 
     async add(id: Snowflake){
         //@ts-ignore
-        const data = await this.client.rest.api.put(Routes.guildMemberRole(data.guild, data.member, id));
+        const data = await this.client.rest.api.put(Routes.guildMemberRole(this.data.guild, this.data.member, id));
         if(data instanceof Error) throw data;
         //@ts-ignore
         this.guild.members.add(data);
@@ -26,7 +26,7 @@ export class MemberRolesManager extends cacheManager<Snowflake, GuildRoles> {
 
     async remove(id: Snowflake){
         //@ts-ignore
-        const data = await this.client.rest.api.delete(Routes.guildMemberRole(data.guild, data.member, id));
+        const data = await this.client.rest.api.delete(Routes.guildMemberRole(this.data.guild, this.data.member, id));
         if(data instanceof Error) throw data;
         //@ts-ignore
         this.guild.members.add(data);

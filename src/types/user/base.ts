@@ -32,6 +32,11 @@ export class BaseUser extends BaseData {
     }
 
 
+    get tag(){
+        if(this.discriminator == "0") return `${this.username}`;
+        return `${this.username}#${this.discriminator}`;
+    };
+
     avatarUrl(options?: ImageURLOptions) {
         if (!this.avatar) return undefined;
         return this.cdn.avatar(this.id, this.avatar, options);

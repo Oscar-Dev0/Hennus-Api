@@ -1,11 +1,11 @@
 {
   "name": "hennus-api",
-  "version": "0.4.0-demo",
+  "version": "0.4.8-demo",
   "description": "Esta es una libreria para el bot Hennus",
   "main": "app/index.js",
   "types": "typescript/index.d.ts",
   "scripts": {
-    "build": "npm run build#clean",
+    "build#Npm": "npm run build#clean && npm publish",
     "build#test": "npm run build#clean-old && tsc --declaration",
     "test": "node Tests",
     "build#clean-old": "rimraf -rf app && npm run build#clean-old-type",

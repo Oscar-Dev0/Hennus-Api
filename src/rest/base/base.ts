@@ -17,7 +17,7 @@ export class baseRest extends BaseRestFunction {
         if (type == "channelMessages") {
             let msg: undefined | APIMessage = undefined;
             //@ts-ignore
-            if (args && args?.files && args.files[0]) msg = await super._post("channelMessages", { ...args, headers: { "Content-Type": "multipart/form-data" } }, ...data);
+            if (args && args?.files && args.files[0]) msg = await super._post("channelMessages", { ...args }, ...data);
             //@ts-ignore
             else if (args && !args.files) msg = await super._post("channelMessages", { body: args, headers: { "Content-Type": "application/json" } }, ...data);
             if (msg instanceof Error) throw msg;

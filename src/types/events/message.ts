@@ -63,13 +63,15 @@ export class Message {
     };
 
     get author(){
-        if(this.message.author) return new User(this.message.author, this.client );
-        return {} as User;
+        if(this.message.author) return new User(this.message.author, this.client )
+        else if(this.member?.user) return this.member.user;
+        else return {} as User;
     };
 
-    get member(){
-        if(!this.message.member) return undefined;
-        return new GuildMember(this.message.member, this.guild, this.client);
+    get member(): GuildMember {
+        if(!this.message.member && this.author) return this.guild.members.resolve(this.author.id) as GuildMember;
+        else if(!this.message.member?.user && this.author ) return this.guild.members.resolve(this.author.id) as GuildMember;
+        else return new GuildMember(this.message.member ?? {} as any, this.guild, this.client) as GuildMember;
     };
 
     get content(){

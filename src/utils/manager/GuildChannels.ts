@@ -14,6 +14,6 @@ export class GuildChannelsManager extends ChannelsManager {
    
     async create(channel: Omit<RESTPostAPIGuildChannelJSONBody, "permission_overwrites"> & { permission_overwrites?: { allow?: Permissions | undefined; deny?: Permissions | undefined; type: OverwriteType; }[] | undefined; }) {
         //@ts-ignore
-        return await super.create_guild(this.guild.id, channel);
-      }
+        return await super.createGuildChannel(this.guild.id, channel);
+      };
 };

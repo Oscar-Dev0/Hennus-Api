@@ -15,7 +15,6 @@ export class HennusWS extends WebSocketManager {
     private client: Client;
 
     constructor(client: Client, rest: REST) {
-
         super({
             token: client.token,
             intents: client.intents.bitfield,

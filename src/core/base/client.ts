@@ -33,7 +33,7 @@ export class BaseClient extends EventEmitter2 {
     aplication: { commands: commandsManger } = {};
     aplicationId: Snowflake;
     rest: HennusRest;
-    wss: HennusWS;
+    ws: HennusWS;
 
     // Aca vamos a ponerle el type a los eventos.
 

@@ -16,24 +16,27 @@ export class Client extends BaseClient {
 
     constructor(public options: Partial<ClientOptions>) {
         super();
-        if (!options.token || options.token.length === 0) {
-            throw new HennusError(errorCodes.TokenNull);
-        }
-        this.token = options.token;
         this.intents.add((options.intents as GatewayIntentBits) ?? 0);
-        this.rest = new HennusRest(this);
-        this.wss = new HennusWS(this, this.rest.api);
         this.channels = new ChannelsManager(this);
         this.users = new UsersManager(this);
         this.guilds = new GuildsManager(this);
         this.aplication.commands = new commandsManger(this);
         this.emojis = new EmojisManager(this);
-    }
+    };
 
-    async login() {
+    async login(token: string) {
+        if (!token || token.length === 0) {
+            throw new HennusError(errorCodes.TokenNull);
+        }; this.token = token;
+
+
         try {
-            await this.wss.connect();
-            this.wss.on(WebSocketShardEvents.Dispatch, ({ data }) => {
+            this.rest = new HennusRest(this);
+
+            const ws = new HennusWS(this, this.rest.api);
+
+            await ws.connect();
+            ws.on(WebSocketShardEvents.Dispatch, ({ data }) => {
                 if (data.t === GatewayDispatchEvents.Ready) {
                     if (!this.status) {
                         this.status = true;
@@ -41,14 +44,16 @@ export class Client extends BaseClient {
                         Object.defineProperty(this, "id", { value: data.d.user.id, configurable: true });
                         Object.defineProperty(this, "aplicationId", { value: data.d.application.id, configurable: true });
 
-                        this.wss.ready(data.d);
+                        ws.ready(data.d);
                     };
                 } else {
-                    this.wss.Handler(data);
-                }
+                    ws.Handler(data);
+                };
             });
+            this.ws = ws;
         } catch {
-            throw new HennusError(errorCodes.ConnectionError);
-        }
-    }
-}
+            throw new HennusError(errorCodes.TokenInvalid);
+        };
+        return token;
+    };
+};

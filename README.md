@@ -16,7 +16,6 @@ const { GatewayIntentBits, Client } = require("hennus-api");
 
 const client =  new Client(
     {
-        token: "Token",
         intents: [ GatewayIntentBits.Guilds ],  
     }
 );
@@ -33,7 +32,7 @@ client.on("InteractionCreate", (int)=>{
     };
 });
 
-client.login();
+client.login("Token");
 
 ```
 

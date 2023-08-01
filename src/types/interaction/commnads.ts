@@ -180,15 +180,15 @@ class Options {
 
 };
 
-type OPString<R extends boolean = false> = R extends true ? Extract<options, {type: "string"}>["return"] : undefined;
-type OPInteger<R extends boolean = false> = R extends true ? Extract<options, {type: "integer"}>["return"] : undefined;
-type OPNumber<R extends boolean = false> = R extends true ? Extract<options, {type: "number"}>["return"] : undefined;
-type OPBoolean<R extends boolean = false> = R extends true ? Extract<options, {type: "boolean"}>["return"] : undefined;
-type OPUser<R extends boolean = false> = R extends true ? Extract<options, {type: "user"}>["return"] : undefined;
-type OPChannel<R extends boolean = false> = R extends true ? Extract<options, {type: "channel"}>["return"] : undefined;
-type OPRole<R extends boolean = false> = R extends true ? Extract<options, {type: "role"}>["return"] : undefined;
-type OPMentionable<R extends boolean = false> = R extends true ? Extract<options, {type: "mentionable"}>["return"] : undefined;
-type OPAttachment<R extends boolean = false> = R extends true ? Extract<options, {type: "attachment"}>["return"] : undefined;
+type OPString<R extends boolean = false> = R extends true ? Extract<options, {type: "string"}>["return"] : Extract<options, {type: "string"}>["return"] | undefined;
+type OPInteger<R extends boolean = false> = R extends true ? Extract<options, {type: "integer"}>["return"] : Extract<options, {type: "integer"}>["return"] | undefined;
+type OPNumber<R extends boolean = false> = R extends true ? Extract<options, {type: "number"}>["return"] : Extract<options, {type: "number"}>["return"] | undefined;
+type OPBoolean<R extends boolean = false> = R extends true ? Extract<options, {type: "boolean"}>["return"] : Extract<options, {type: "boolean"}>["return"] | undefined;
+type OPUser<R extends boolean = false> = R extends true ? Extract<options, {type: "user"}>["return"] : Extract<options, {type: "user"}>["return"] | undefined;
+type OPChannel<R extends boolean = false> = R extends true ? Extract<options, {type: "channel"}>["return"] : Extract<options, {type: "channel"}>["return"] | undefined;
+type OPRole<R extends boolean = false> = R extends true ? Extract<options, {type: "role"}>["return"] : Extract<options, {type: "role"}>["return"] | undefined;
+type OPMentionable<R extends boolean = false> = R extends true ? Extract<options, {type: "mentionable"}>["return"] : Extract<options, {type: "mentionable"}>["return"] | undefined;
+type OPAttachment<R extends boolean = false> = R extends true ? Extract<options, {type: "attachment"}>["return"] : Extract<options, {type: "attachment"}>["return"] | undefined;
 
 
 type options =

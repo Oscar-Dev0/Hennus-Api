@@ -61,55 +61,55 @@ class Options {
         else return find;
     };
 
-    public getString<R extends boolean = false>(name: string, required: R): OPString<R>{
+    public getString<R extends boolean = false>(name: string, required?: R): OPString<R>{
         const data = this.find("string", name);
         if(required) return data as any;
         else return (data ?? undefined) as any;
     };
 
-    public getInteger<R extends boolean = false>(name: string, required: R): OPInteger<R>{
+    public getInteger<R extends boolean = false>(name: string, required?: R): OPInteger<R>{
         const data = this.find("integer", name);
         if(required) return data as any;
         else return (data ?? undefined) as any;
     };
 
-    public getNumber<R extends boolean = false>(name: string, required: R): OPNumber<R>{
+    public getNumber<R extends boolean = false>(name: string, required?: R): OPNumber<R>{
         const data = this.find("number", name);
         if(required) return data as any;
         else return (data ?? undefined) as any;
     };
 
-    public getBoolean<R extends boolean = false>(name: string, required: R): OPBoolean<R>{
+    public getBoolean<R extends boolean = false>(name: string, required?: R): OPBoolean<R>{
         const data = this.find("boolean", name);
         if(required) return data as any;
         else return (data ?? undefined) as any;
     };
 
-    public getUser<R extends boolean = false>(name: string, required: R): OPUser<R>{
+    public getUser<R extends boolean = false>(name: string, required?: R): OPUser<R>{
         const data = this.find("user", name);
         if(required) return data as any;
         else return (data ?? undefined) as any;
     };
 
-    public getChannel<R extends boolean = false>(name: string, required: R): OPChannel<R>{
+    public getChannel<R extends boolean = false>(name: string, required?: R): OPChannel<R>{
         const data = this.find("channel", name);
         if(required) return data as any;
         else return (data ?? undefined) as any;
     };
 
-    public getRole<R extends boolean = false>(name: string, required: R): OPRole<R>{
+    public getRole<R extends boolean = false>(name: string, required?: R): OPRole<R>{
         const data = this.find("role", name);
         if(required) return data as any;
         else return (data ?? undefined) as any;
     };
 
-    public getMentionable<R extends boolean = false>(name: string, required: R): OPMentionable<R>{
+    public getMentionable<R extends boolean = false>(name: string, required?: R): OPMentionable<R>{
         const data = this.find("mentionable", name);
         if(required) return data as any;
         else return (data ?? undefined) as any;
     };
 
-    public getAttachment<R extends boolean = false>(name: string, required: R): OPAttachment<R>{
+    public getAttachment<R extends boolean = false>(name: string, required?: R): OPAttachment<R>{
         const data = this.find("attachment", name);
         if(required) return data as any;
         else return (data ?? undefined) as any;

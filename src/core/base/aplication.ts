@@ -1,5 +1,5 @@
 import { Snowflake } from "discord-api-types/globals";
-import { interactionData } from "../../types";
+import { ApplicationCommandData } from "../../types";
 import { Permissions } from "../../types/base/permissions";
 import { HennusError, errorCodes } from "../Error";
 import { Client } from "../session";
@@ -9,7 +9,7 @@ export class commandsManger {
     constructor( private _client: Client ) {
     };
 
-    async set( commands: interactionData[], guildId?: Snowflake  ){
+    async set( commands: ApplicationCommandData[], guildId?: Snowflake  ){
         if(!Array.isArray(commands)) return undefined;
             const data = await this._client.rest.api.put(this.paths(guildId), {
             body: commands.map(c => this.format(c)),
@@ -17,7 +17,7 @@ export class commandsManger {
           return data;
     };
 
-    async create( command: interactionData ){
+    async create( command: ApplicationCommandData ){
         const cmd = this.format(command);
        return await this._client.rest.post("applicationCommands", cmd, this._client.aplicationId );
     };
@@ -26,7 +26,7 @@ export class commandsManger {
         return await this._client.rest.api.delete(this.paths(guildId, id));
     };
 
-    private format(cmd: interactionData): RESTPostAPIApplicationCommandsJSONBody{
+    private format(cmd: ApplicationCommandData): RESTPostAPIApplicationCommandsJSONBody{
         const regex = RegExp(/[A-Z]/g);
         if( regex.test(cmd.name) ) throw new HennusError(errorCodes.CommandNameUpperCase); 
         if( cmd.name.length <= 0 && cmd.name.length > 32) throw new HennusError(errorCodes.InvalidCommandNameLength);

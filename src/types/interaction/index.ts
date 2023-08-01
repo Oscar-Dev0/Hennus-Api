@@ -1,4 +1,4 @@
-import { APICommandAutocompleteInteractionResponseCallbackData, InteractionResponseType, RESTPostAPIApplicationCommandsJSONBody, RESTPostAPIApplicationCommandsResult } from "discord-api-types/v10";
+import { APICommandAutocompleteInteractionResponseCallbackData, InteractionResponseType, RESTPostAPIApplicationCommandsResult, APIApplicationCommand, ApplicationCommandType } from "discord-api-types/v10";
 import { MessageInteractionOptions } from "../message";
 import { ModalBuilder } from "../../build";
 import { Permissions } from "../base/permissions";
@@ -10,8 +10,28 @@ import { ComponentsInteraction, InteractionButton, InteractionSelectAny } from "
 
 
 
-
 export { ComponentsInteraction, InteractionButton, InteractionSelectAny, InteractionCommands, InteractionModal };
+
+
+type interactionBase = AddUndefinedToPossiblyUndefinedPropertiesOfInterface<Omit<APIApplicationCommand, 'id' | 'application_id' | 'description' | 'type' | 'version' | 'guild_id' | 'name_localized' | 'description_localized' | 'default_member_permissions'> & Partial<Pick<{ default_member_permissions?: Permissions  |Permissions[] }, "default_member_permissions">>>;
+
+interface ChatInputApplicationCommands extends interactionBase  {
+    type?: ApplicationCommandType.ChatInput | undefined;
+    description: string;
+};
+
+interface ContextMenuApplicationCommands extends interactionBase {
+    type: ApplicationCommandType.User | ApplicationCommandType.Message;
+};
+
+export type ApplicationCommandData = ChatInputApplicationCommands | ContextMenuApplicationCommands;
+
+
+
+
+
+
+
 
 
 
@@ -26,11 +46,6 @@ export type interactionResponse =
 { type: InteractionResponseType.ApplicationCommandAutocompleteResult, data: APICommandAutocompleteInteractionResponseCallbackData } |
 { type: InteractionResponseType.Modal, data: ModalBuilder };
 
-export type interactionData = Omit<RESTPostAPIApplicationCommandsJSONBody, "default_member_permissions"> &
-({ default_member_permissions?: Permissions } |
-{ default_member_permissions?: Permissions[] }) & { description : string};
-
 export type interactionResult = RESTPostAPIApplicationCommandsResult;
-
 
 export type Interaction = InteractionCommands | InteractionModal | ComponentsInteraction;

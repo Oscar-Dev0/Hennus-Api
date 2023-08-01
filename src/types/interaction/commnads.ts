@@ -37,22 +37,92 @@ export class InteractionCommands extends BasedInteraction {
         this.commandType = this.cmdData.type;
     };
 
-    get options() {
-        return {
-            attachment: (name: string) => this.find("attachment", name),
-            boolean: (name: string) => this.find("boolean",name),
-            channel: (name: string) => this.find("channel", name),
-            integer: (name: string) => this.find("integer", name),
-            mentionable: (name: string) => this.find("mentionable", name),
-            number: (name: string) => this.find("number", name),
-            role: (name: string) => this.find("role", name),
-            string: (name: string) => this.find("string", name),
-            subCommand: this.find("subcommand"),
-            subCommandGroup: this.find("subcommandGroup"),
-            user: (name: string) => this.find("user", name),
-        };
+    public options = new Options(this);
+
+    toString() {
+        if(this.commandName && this.commandId) return `</${this.commandName}:${this.commandId}>`;
+        else return "";
     };
+
+};
+
+
+class Options {
+    private data: InteractionCommands;
     
+    constructor(data: InteractionCommands){
+        Object.defineProperty(this, "data", { value: data });
+    };
+
+    public get(name: string, required: boolean){
+        const data = this.datas("null");
+        const find = data.find((d)=> d.name == name);
+        if(required && find) return find;
+        else return find;
+    };
+
+    public getString<R extends boolean = false>(name: string, required: R): OPString<R>{
+        const data = this.find("string", name);
+        if(required) return data as any;
+        else return (data ?? undefined) as any;
+    };
+
+    public getInteger<R extends boolean = false>(name: string, required: R): OPInteger<R>{
+        const data = this.find("integer", name);
+        if(required) return data as any;
+        else return (data ?? undefined) as any;
+    };
+
+    public getNumber<R extends boolean = false>(name: string, required: R): OPNumber<R>{
+        const data = this.find("number", name);
+        if(required) return data as any;
+        else return (data ?? undefined) as any;
+    };
+
+    public getBoolean<R extends boolean = false>(name: string, required: R): OPBoolean<R>{
+        const data = this.find("boolean", name);
+        if(required) return data as any;
+        else return (data ?? undefined) as any;
+    };
+
+    public getUser<R extends boolean = false>(name: string, required: R): OPUser<R>{
+        const data = this.find("user", name);
+        if(required) return data as any;
+        else return (data ?? undefined) as any;
+    };
+
+    public getChannel<R extends boolean = false>(name: string, required: R): OPChannel<R>{
+        const data = this.find("channel", name);
+        if(required) return data as any;
+        else return (data ?? undefined) as any;
+    };
+
+    public getRole<R extends boolean = false>(name: string, required: R): OPRole<R>{
+        const data = this.find("role", name);
+        if(required) return data as any;
+        else return (data ?? undefined) as any;
+    };
+
+    public getMentionable<R extends boolean = false>(name: string, required: R): OPMentionable<R>{
+        const data = this.find("mentionable", name);
+        if(required) return data as any;
+        else return (data ?? undefined) as any;
+    };
+
+    public getAttachment<R extends boolean = false>(name: string, required: R): OPAttachment<R>{
+        const data = this.find("attachment", name);
+        if(required) return data as any;
+        else return (data ?? undefined) as any;
+    };
+
+    get subCommand(){
+        return this.find("subcommand");
+    };
+
+    get subCommandGroup(){
+        return this.find("subcommandGroup");
+    };
+
     private find<T extends options["type"]>(type: T, find?: string): Extract<options, { type: T }>["return"] {
         const typeMapping: { [K in options["type"]]: ApplicationCommandOptionType } = {
             number: ApplicationCommandOptionType.Number,
@@ -78,21 +148,21 @@ export class InteractionCommands extends BasedInteraction {
         
     
         if (type === "channel") {
-            const channel = this.client.channels.resolve(finds.value as string);
-            return { id: finds.value, channel } as any;
+            const channel = this.data.client.channels.resolve(finds.value as string);
+            return { id: finds.value, channel, name: finds.name, type: finds.type } as any;
         } else if (type === "role") {
-            const role = this.guild.roles.cache.get(finds.value as string);
-            return { id: finds.value, role } as any;
+            const role = this.data.guild.roles.cache.get(finds.value as string);
+            return { id: finds.value, role, name: finds.name, type: finds.type } as any;
         } else if (type === "user") {
-            const user = this.client.users.resolve(finds.value as string);
-            return { id: finds.value, user } as any;
+            const user = this.data.client.users.resolve(finds.value as string);
+            return { id: finds.value, user, name: finds.name, type: finds.type } as any;
         }
     
-        return finds.value as any;
+        return { name: finds.name, type: finds.type, value: finds.value } as any;
     };
     
     private datas<T extends datas["type"]>(type: T): Extract<datas, { type: T }>["return"] {
-        const data = this.cmdData;
+        const data = this.data.cmdData;
         if (data.type !== ApplicationCommandType.ChatInput) return [] as any;
         let datos = data.options ?? [];
     
@@ -104,25 +174,33 @@ export class InteractionCommands extends BasedInteraction {
             if (type === "subcommand") return [datos[0].name, datos[0].options ?? []] as any;
             return (datos[0].options ?? []) as any;
         };
+        if(type === "subcommand" || type === "subcommandGroup") return [] as any;
         return datos as any;
     };
-    toString() {
-        if(this.commandName && this.commandId) return `</${this.commandName}:${this.commandId}>`;
-        else return "";
-    };
-    
 
 };
 
+type OPString<R extends boolean = false> = R extends true ? Extract<options, {type: "string"}>["return"] : undefined;
+type OPInteger<R extends boolean = false> = R extends true ? Extract<options, {type: "integer"}>["return"] : undefined;
+type OPNumber<R extends boolean = false> = R extends true ? Extract<options, {type: "number"}>["return"] : undefined;
+type OPBoolean<R extends boolean = false> = R extends true ? Extract<options, {type: "boolean"}>["return"] : undefined;
+type OPUser<R extends boolean = false> = R extends true ? Extract<options, {type: "user"}>["return"] : undefined;
+type OPChannel<R extends boolean = false> = R extends true ? Extract<options, {type: "channel"}>["return"] : undefined;
+type OPRole<R extends boolean = false> = R extends true ? Extract<options, {type: "role"}>["return"] : undefined;
+type OPMentionable<R extends boolean = false> = R extends true ? Extract<options, {type: "mentionable"}>["return"] : undefined;
+type OPAttachment<R extends boolean = false> = R extends true ? Extract<options, {type: "attachment"}>["return"] : undefined;
+
+
 type options =
-    | { type: "string"; return: string }
-    | { type: "integer" | "number"; return: number }
-    | { type: "boolean"; return: boolean }
-    | { type: "user"; return: { id: Snowflake; user?: User } }
-    | { type: "channel"; return: { id: Snowflake; channel?: Channel } }
-    | { type: "role"; return: { id: Snowflake; role?: GuildRoles } }
-    | { type: "mentionable"; return: Snowflake }
-    | { type: "attachment"; return: Snowflake }
+    | { type: "string"; return: { name: string, type: ApplicationCommandOptionType.String, value: string } }
+    | { type: "number"; return: { name: string, type: ApplicationCommandOptionType.Number , value: number } }
+    | { type: "integer"; return: { name: string, type: ApplicationCommandOptionType.Integer, value: number } }
+    | { type: "boolean"; return: { name: string, type: ApplicationCommandOptionType.Boolean, value: boolean } }
+    | { type: "user"; return: { name: string, type: ApplicationCommandOptionType.User, id: Snowflake; user?: User } }
+    | { type: "channel"; return: { name: string, type: ApplicationCommandOptionType.Channel, id: Snowflake; channel?: Channel } }
+    | { type: "role"; return: { name: string, type: ApplicationCommandOptionType.Role, id: Snowflake; role?: GuildRoles,  } }
+    | { type: "mentionable"; return: { name: string, type: ApplicationCommandOptionType.Mentionable, value: Snowflake } }
+    | { type: "attachment"; return: { name: string, type: ApplicationCommandOptionType.Attachment, value: string } }
     | { type: "subcommandGroup"; return: subcommandGroup["return"] }
     | { type: "subcommand"; return: subcommand["return"] };
 
@@ -131,14 +209,14 @@ type datas = subcommand | subcommandGroup | gruponull;
 interface subcommand {
     type: "subcommand";
     return: [name: string, options: APIApplicationCommandInteractionDataBasicOption[]];
-}
+};
 
 interface subcommandGroup {
     type: "subcommandGroup";
     return: [name: string, options: APIApplicationCommandInteractionDataSubcommandOption[]];
-}
+};
 
 interface gruponull {
     type: "null";
     return: APIApplicationCommandInteractionDataBasicOption[];
-}
+};

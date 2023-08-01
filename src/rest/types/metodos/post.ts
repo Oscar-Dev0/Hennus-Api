@@ -1,5 +1,5 @@
 import {  APIMessage, InteractionResponseType, RESTPostAPIApplicationCommandsJSONBody, Routes } from "discord-api-types/v10";
-import { Message, MessageChannelOptions, MessageInteractionOptions, interactionData, interactionResponse, interactionResult } from "../../../types";
+import { Message, MessageChannelOptions, MessageInteractionOptions, interactionResponse, interactionResult } from "../../../types";
 import { RawFile } from "@discordjs/rest";
 
 

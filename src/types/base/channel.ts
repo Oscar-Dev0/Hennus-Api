@@ -137,7 +137,7 @@ export class BaseChannel extends BaseData {
     };
 
     toString() {
-        if (this.id) return `<@#${this.id}>`;
+        if (this.id) return `<#${this.id}>`;
         else return "";
     };
 

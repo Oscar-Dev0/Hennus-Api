@@ -1,8 +1,6 @@
-import { RESTPostAPIGuildChannelJSONBody, OverwriteType } from "discord-api-types/v10";
 import { Client } from "../../core";
 import { Guild } from "../../types";
-import { Permissions } from "../../types/base/permissions";
-import { ChannelsManager } from "./channels";
+import { ChannelsManager, CreateGuildChannel } from "./channels";
 
 export class GuildChannelsManager extends ChannelsManager {
 
@@ -12,8 +10,11 @@ export class GuildChannelsManager extends ChannelsManager {
     };
 
    
-    async create(channel: Omit<RESTPostAPIGuildChannelJSONBody, "permission_overwrites"> & { permission_overwrites?: { allow?: Permissions | undefined; deny?: Permissions | undefined; type: OverwriteType; }[] | undefined; }) {
+    async create(channel: CreateGuildChannel) {
         //@ts-ignore
         return await super.createGuildChannel(this.guild.id, channel);
       };
 };
+
+
+

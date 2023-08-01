@@ -1,11 +1,11 @@
-import { Collection } from "@discordjs/collection";
-import { BasedCategoryChannel, BasedDmChannel, BasedForumChannel, BasedTextChannel, BasedThreadChannel, BasedVoiceChannel, Channel, UpdateChannel } from "../../types";
+import { Channel, Overwrite, UpdateChannel } from "../../types";
 import { cacheManager } from "./base";
 import { Client } from "../../core";
 import { Snowflake } from "discord-api-types/globals";
-import { APIChannel, APIGuildCreatePartialChannel, ChannelType, OverwriteType, RESTPostAPIGuildChannelJSONBody, Routes } from "discord-api-types/v10";
+import { APIChannel, APIGuildChannelResolvable, OverwriteType, RESTPostAPIGuildChannelJSONBody, Routes } from "discord-api-types/v10";
 import { Permissions } from "../../types/base/permissions";
 import { channelConvertidor } from "../functions";
+import { DistributiveOmit, DistributivePick, StrictPartial } from "discord-api-types/utils/internals";
 
 export class ChannelsManager extends cacheManager<string, Channel> {
     constructor(client: Client) {
@@ -48,7 +48,7 @@ export class ChannelsManager extends cacheManager<string, Channel> {
         return this.cache;
     };
 
-    async createGuildChannel(guild_id: Snowflake, data: Omit<RESTPostAPIGuildChannelJSONBody, "permission_overwrites"> & { permission_overwrites?: Array<{ allow?: Permissions, deny?: Permissions, type: OverwriteType; }> }) {
+    async createGuildChannel(guild_id: Snowflake, data: CreateGuildChannel ) {
         const channel: APIChannel = await this.client.rest.api.post(Routes.guildChannels(guild_id), { body: data }) as any;
         if(!channel) return undefined;
         if(channel instanceof Error) throw channel;
@@ -70,4 +70,17 @@ export class ChannelsManager extends cacheManager<string, Channel> {
     };
 
 
+};
+
+
+
+
+export type CreateGuildChannel = DistributiveOmit<GuildCreatePartialChannel, 'id'>;
+
+
+type GuildCreatePartialChannel = StrictPartial<DistributivePick<APIGuildChannelResolvable, 'type' | 'topic' | 'nsfw' | 'bitrate' | 'user_limit' | 'rate_limit_per_user' | 'default_auto_archive_duration' | 'position' | 'rtc_region' | 'video_quality_mode' | 'flags' | 'default_reaction_emoji' | 'available_tags' | 'default_sort_order' | 'default_forum_layout' | 'default_thread_rate_limit_per_user'>> & {
+    name: string;
+    id?: number | string | undefined;
+    parent_id?: number | string | null | undefined;
+    permission_overwrites?: Overwrite[] | undefined;
 };

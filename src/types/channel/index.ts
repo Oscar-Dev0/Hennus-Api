@@ -11,6 +11,20 @@ export { BasedDmChannel, BasedTextChannel, BasedVoiceChannel, BasedCategoryChann
 
 export type Channel = BasedTextChannel | BasedDmChannel | BasedVoiceChannel | BasedCategoryChannel | BasedForumChannel | BasedThreadChannel;
 
+
+export type UpdateChannel = UpdateDMGrupChannel | UpdateForumChannel | UpdateTextAnnouncementChannel | UpdateThreadChannel | UpdateVoiceStageChannel;
+
+
+export type Overwrite = Omit<APIOverwrite, "allow" | "deny"> & { deny?: Permissions, allow?: Permissions };
+
+
+
+
+
+
+//Update
+
+
 export interface UpdateTextAnnouncementChannel {
   name?: string;
   type?: ChannelType.GuildNews;
@@ -23,7 +37,6 @@ export interface UpdateTextAnnouncementChannel {
   rtc_region?: string;
   default_auto_archive_duration?: number;
 };
-
 
 export interface UpdateVoiceStageChannel {
   name?: string;
@@ -52,7 +65,6 @@ export interface UpdateForumChannel {
   default_forum_layout?: number;
 };
 
-
 interface Tag {
   id: string; 
   name: string; 
@@ -78,8 +90,3 @@ export interface UpdateDMGrupChannel {
   /** icono codificado en base64 */
   icon?: string;
 };
-
-export type UpdateChannel = UpdateDMGrupChannel | UpdateForumChannel | UpdateTextAnnouncementChannel | UpdateThreadChannel | UpdateVoiceStageChannel;
-
-
-export type Overwrite = Omit<APIOverwrite, "allow" | "deny"> & { deny?: Permissions, allow?: Permissions };

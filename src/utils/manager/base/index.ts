@@ -18,6 +18,7 @@ export class cacheManager<T, V> {
     };
 
     resolve(data: T | V ): V | undefined{
+        if(!data) return undefined;
         //@ts-ignore
         if (typeof data === 'object'  && this.cache.get(data.id)) return this.cache.get(data.id) as V;
         //@ts-ignore

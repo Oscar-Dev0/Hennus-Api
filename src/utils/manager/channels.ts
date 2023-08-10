@@ -16,9 +16,7 @@ export class ChannelsManager extends cacheManager<string, Channel> {
 
     setall(map: Channel[]) {
         if (map && Array.isArray(map)) {
-            for(const channel of map){
-                if (channel) this.cache.set(channel.id, channel);
-            };
+            map.forEach((channel)=>{ if (channel) this.cache.set(channel.id, channel);})
             return true;
         } else {
             return false;

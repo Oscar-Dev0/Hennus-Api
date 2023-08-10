@@ -23,7 +23,7 @@ export class MessagesManager extends cacheManager<Snowflake, Message> {
     };
 
     async fetchall( channelId: string){
-            if(!this.search) this.rest.get("channelMessages", channelId).then((msgs)=>{ this.search = true; for(const msg of msgs ?? []) this.cache.set(msg.id, msg)});
+            if(!this.search) this.rest.get("channelMessages", channelId).then((msgs)=>{ this.search = true; (msgs ?? []).forEach((msg) => this.cache.set(msg.id, msg))});
             return this.cache;
     };
 

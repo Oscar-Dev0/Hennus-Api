@@ -36,9 +36,7 @@ export class MemberRolesManager extends cacheManager<Snowflake, GuildRoles> {
 
 
     public setall(roles: GuildRoles[]){
-        for (const role of roles){
-            if(!this.resolve(role)) this.cache.set(role.id, role);
-        };
+        roles.forEach((role)=>{ if(!this.resolve(role)) this.cache.set(role.id, role); });
         return this;
     };
 };

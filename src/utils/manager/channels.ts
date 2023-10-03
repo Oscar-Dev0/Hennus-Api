@@ -12,16 +12,16 @@ export class ChannelsManager extends cacheManager<string, Channel> {
         super(client);
     };
 
-    private _maps = false;
-
-    setall(map: Channel[]) {
+    async setall(map: Channel[]) {
         if (map && Array.isArray(map)) {
-            map.forEach((channel)=>{ if (channel) this.cache.set(channel.id, channel);})
+            map.forEach((channel) => {
+                if (channel) this.cache.set(channel.id, channel);
+            });
             return true;
         } else {
             return false;
-        };
-    };
+        }
+    }
 
     update(channel: Channel) {
         if (this.cache.has(channel.id)) {
@@ -47,11 +47,16 @@ export class ChannelsManager extends cacheManager<string, Channel> {
     };
 
     async createGuildChannel(guild_id: Snowflake, data: CreateGuildChannel ) {
-        const channel: APIChannel = await this.client.rest.api.post(Routes.guildChannels(guild_id), { body: data }) as any;
-        if(!channel) return undefined;
-        if(channel instanceof Error) throw channel;
-        return channelConvertidor(channel, this.client);
-    };
+        try {
+            const channel: APIChannel = await this.client.rest.api.post(Routes.guildChannels(guild_id), { body: data }) as any;
+            if (!channel) return undefined;
+            if (channel instanceof Error) throw channel;
+            return channelConvertidor(channel, this.client);
+        } catch (error) {
+            console.error("Error creating guild channel:", error);
+            return undefined;
+        }
+    }
 
     async delete(id: Snowflake) {
         this.client.rest.api.delete(Routes.channel(id));
@@ -65,6 +70,14 @@ export class ChannelsManager extends cacheManager<string, Channel> {
         if(!channel) return undefined;
         if(channel instanceof Error) throw channel;
         return channelConvertidor(channel, this.client);
+    };
+
+    async fetch(id: string, force?: boolean){
+        const cache = this.cache.get(id);
+        if(!force) return cache;
+        let channel = await this.rest.get("channel", id);
+        if(channel) return channel;
+        else return undefined;
     };
 
 

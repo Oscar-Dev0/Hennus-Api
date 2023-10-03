@@ -27,6 +27,10 @@ export class MessagesManager extends cacheManager<Snowflake, Message> {
             return this.cache;
     };
 
+    async fetchallR(channelId: string){
+        return await this.rest.get("channelMessages", channelId)
+    };
+
     update(message: Message){
         if (this.cache.has(message.id)){
             const oldMessage = this.cache.get(message.id);

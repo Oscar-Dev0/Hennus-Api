@@ -39,4 +39,17 @@ export class MemberRolesManager extends cacheManager<Snowflake, GuildRoles> {
         roles.forEach((role)=>{ if(!this.resolve(role)) this.cache.set(role.id, role); });
         return this;
     };
+
+
+    get color() {
+        const coloredRoles = this.cache.filter(role => role.color);
+        if (!coloredRoles.size) return undefined;
+        return coloredRoles.reduce((prev: GuildRoles, role) => (role.position> 0 ? role : prev));
+      };
+    
+      get hoist() {
+        const hoistedRoles = this.cache.filter(role => role.hoist);
+        if (!hoistedRoles.size) return undefined;
+        return hoistedRoles.reduce((prev: GuildRoles, role) => (role.position > 0 ? role : prev));
+      };
 };

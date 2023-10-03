@@ -51,4 +51,9 @@ export class GuildRoles extends BaseData {
         if (this.id) return `<@&${this.id}>`;
         else return "";
     };
-}
+
+    get hexColor() {
+        return `#${this.color.toString(16).padStart(6, '0')}`;
+    };
+  
+};

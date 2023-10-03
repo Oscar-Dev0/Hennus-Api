@@ -10,6 +10,7 @@ export interface getReturn {
     guildMembers: APIGuildMember[];
     guildChannels: APIChannel[];
     guildRoles: APIRole[];
+    channel: APIChannel;
     channelMessage: APIMessage;
     channelMessages: APIMessage[];
 };
@@ -22,6 +23,7 @@ export interface getOptions {
     guildMembers: [ guildId: Snowflake ];
     guildRoles: [ guildId: string ];
     guildChannels: [ guildId: Snowflake ];
+    channel: [channelId: string];
     channelMessage: [ cahnnelId: Snowflake, messageId: Snowflake ];
     channelMessages: [ cahnnelId: Snowflake ];
 };
@@ -30,6 +32,7 @@ interface getLink {
     /**@types `/users/@me` |  `/users/${user.id}`*/
     user: `/users/${string}`;
     userGuilds: `/users/@me/guilds`;
+    channel: `/channels/${string}`,
     guild: `/guilds/${string}`;
     guildMember: `/guilds/${string}/members/${string}`;
     guildMembers: `/guilds/${string}/members`;
@@ -43,7 +46,7 @@ interface getLink {
 
 
 export function GetRoutes<T extends keyof getOptions>( type:T , ...args: getOptions[T] ): getLink[T] {
-    Routes.interactionCallback
+    Routes.channel
     const router = Routes[type];
     //@ts-ignore
     return router(...args) as D["link"];
@@ -58,7 +61,8 @@ export interface getNode {
     guild: { return: Guild, data: getOptions['guild'] };
     guildMember: { return: GuildMember, data: getOptions['guildMember'] };
     guildMembers: { return: GuildMember[], data: getOptions['guildMembers']};
-    guildRoles: { return: GuildRoles[], data: getOptions['guildRoles'] }
+    guildRoles: { return: GuildRoles[], data: getOptions['guildRoles'] };
+    channel: { return: Channel, data: getOptions["channel"] };
     channelMessage: { return: Message, data: getOptions['channelMessage'] };
     channelMessages: { return: Message[], data: getOptions['channelMessages'] };
 };

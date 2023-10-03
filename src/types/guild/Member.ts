@@ -24,7 +24,7 @@ export class GuildMember extends BaseData {
     public pending: boolean;
     public communicationDisabledUntilTimestamp: string | undefined;
 
-    constructor(private member: APIGuildMember,  guild: Guild, client: Client) {
+    constructor(private member: APIGuildMember, guild: Guild, client: Client) {
 
         super(client);
 
@@ -47,7 +47,7 @@ export class GuildMember extends BaseData {
         this.communicationDisabledUntilTimestamp = member.communication_disabled_until ?? undefined;
     };
 
-    get roles(){
+    get roles() {
         const roles = new MemberRolesManager(this.client, this.guild.id, this.user?.id ?? '');
         const map = this.guild.roles.searchlist(this._roles);
         roles.setall(map);
@@ -70,6 +70,10 @@ export class GuildMember extends BaseData {
 
     get communicationDisabledUntil() {
         return this.communicationDisabledUntilTimestamp && new Date(this.communicationDisabledUntilTimestamp);
+    };
+
+    get displayHexColor() {
+        return this.roles.color?.hexColor ?? '#000000';
     };
 
     toString() {

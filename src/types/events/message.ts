@@ -112,5 +112,6 @@ export class Message {
         if(msg instanceof Error) throw msg;
         return msg;
     };
-    
+
+
 };

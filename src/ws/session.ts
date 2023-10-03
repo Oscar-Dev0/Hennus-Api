@@ -1,8 +1,8 @@
 import { WebSocketManager, WorkerShardingStrategy } from "@discordjs/ws";
 import { Client, } from "../core";
 import { REST } from "@discordjs/rest";
-import { ChannelType, ComponentType, GatewayDispatchEvents, GatewayDispatchPayload, GatewayIntentBits, GatewayReadyDispatchData, GatewaySendPayload, InteractionType } from "discord-api-types/v10";
-import { Guild, GuildMember, Interaction, Message, Ready, User, GuildEmojis} from "../types";
+import { ChannelType, ComponentType, GatewayDispatchEvents, GatewayDispatchPayload, GatewayGuildCreateDispatch, GatewayIntentBits, GatewayReadyDispatchData, GatewaySendPayload, InteractionType } from "discord-api-types/v10";
+import { Guild, GuildMember, Interaction, Message, Ready, User, GuildEmojis, Channel} from "../types";
 import { Presence } from "../types/events/Presence";
 import { InteractionModal } from "../types/interaction/modal";
 import { InteractionCommands } from "../types/interaction/commnads";
@@ -31,20 +31,8 @@ export class HennusWS extends WebSocketManager {
 
 
     async Handler(data: GatewayDispatchPayload) {
-        if (data.t == GatewayDispatchEvents.GuildCreate) {
-            //Cargando todo.
-            const guild = new Guild(data.d, this.client);
-            guild.memberCount = data.d.member_count;
-            guild.roles.setall(data.d.roles);
-            const channels: any = [...data.d.channels, ...data.d.threads].map((channel) => {return channelConvertidor(channel, this.client)}).filter((x) => x !== undefined);
-            this.client.channels.setall(channels);
-            guild.members.setall(data.d.members, guild);
-            this.client.emojis.setall(data.d.emojis.map((x)=> new GuildEmojis(x, guild, this.client)));
-            const cache = this.client.guilds.cache.get(guild.id);
-            if (!cache) this.client.guilds.cache.set(guild.id, guild);
-
-            this.client.emit("GuildCreate", guild);
-        } else if (data.t == GatewayDispatchEvents.GuildUpdate) {
+        if (data.t == GatewayDispatchEvents.GuildCreate) await this.handleGuildCreate(data)
+         else if (data.t == GatewayDispatchEvents.GuildUpdate) {
             const cache = this.client.guilds.cache.get(data.d.id);
             if (cache) {
                 this.client.guilds.cache.delete(cache.id);
@@ -202,11 +190,9 @@ export class HennusWS extends WebSocketManager {
 
     async ready(data: GatewayReadyDispatchData) {
         const ready = new Ready(data, this.client);
-
         this.client.emit("Ready", ready);
 
         if (!this.client.intents.has(GatewayIntentBits.Guilds)) {
-
             for (let index = 0; index < data.guilds.length; index++) {
                 if (index > 5) continue;
                 const element = data.guilds[index];
@@ -214,17 +200,36 @@ export class HennusWS extends WebSocketManager {
                 let guild;
 
                 if (element.unavailable) guild = await this.client.rest.get("guild", element.id);
+
                 if (channels) {
                     this.client.channels.setall(channels);
-                };
+                }
+
                 if (guild) {
                     guild.members.fetchall();
                     guild.roles.fetchall(guild.id);
-                    this.client.guilds.cache.set(guild.id, guild)
-                };
+                    this.client.guilds.cache.set(guild.id, guild);
+                }
+            }
+        }
+    }
+    async handleGuildCreate(data: GatewayGuildCreateDispatch) {
+        const guild = new Guild(data.d, this.client);
+        guild.memberCount = data.d.member_count;
+        guild.roles.setall(data.d.roles);
 
-            };
-        };
+        const channels = [...data.d.channels, ...data.d.threads]
+            .map((channel) => channelConvertidor(channel, this.client) as Channel)
+            .filter((x) => x !== undefined);
+
+        this.client.channels.setall(channels);
+        guild.members.setall(data.d.members, guild);
+        this.client.emojis.setall(data.d.emojis.map((x) => new GuildEmojis(x, guild, this.client)));
+
+        const cache = this.client.guilds.cache.get(guild.id);
+        if (!cache) this.client.guilds.cache.set(guild.id, guild);
+
+        this.client.emit("GuildCreate", guild);
     };
 
     async sendall(packet: GatewaySendPayload){

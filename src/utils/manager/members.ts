@@ -35,19 +35,25 @@ export class MembersManager extends cacheManager<string, GuildMember> {
         return this.cache;
     };
 
-    setall(members: APIGuildMember[], guild: Guild){
-        if( !this._maps && members && Array.isArray(members)){
+    setall(members: APIGuildMember[], guild: Guild): Map<string, GuildMember> {
+        if (!this._maps && Array.isArray(members)) {
             this._maps = true;
-            members.forEach((member)=>{
+            
+            members.forEach((member) => {
                 const user = member.user;     
-                if(user){
-                    if(!this.cache.has(user.id)) this.cache.set(user.id, new GuildMember(member, guild, this.client));
-                    if(!this.client.users.resolve(user.id)) this.client.users.cache.set(user.id, new User(user, this.client));
-                };
+                if (user) {
+                    if (!this.cache.has(user.id)) {
+                        this.cache.set(user.id, new GuildMember(member, guild, this.client));
+                    }
+                    if (!this.client.users.resolve(user.id)) {
+                        this.client.users.cache.set(user.id, new User(user, this.client));
+                    }
+                }
             });
-        };
+        }
         return this.cache;
-    };
+    }
+    
 
     add(member: GuildMember){
         const cache = this.resolve(member.user?.id ?? "");

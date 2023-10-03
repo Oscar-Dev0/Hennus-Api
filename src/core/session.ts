@@ -11,7 +11,6 @@ import { commandsManger } from "./base/aplication";
 import { EmojisManager } from "../utils/manager/emojis";
 
 export class Client extends BaseClient {
-
     private status = false;
 
     constructor(public options: Partial<ClientOptions>) {
@@ -22,38 +21,41 @@ export class Client extends BaseClient {
         this.guilds = new GuildsManager(this);
         this.aplication.commands = new commandsManger(this);
         this.emojis = new EmojisManager(this);
-    };
+    }
 
     async login(token: string) {
         if (!token || token.length === 0) {
             throw new HennusError(errorCodes.TokenNull);
-        }; this.token = token;
+        }
 
+        this.token = token;
 
         try {
             this.rest = new HennusRest(this);
-
             const ws = new HennusWS(this, this.rest.api);
-
             await ws.connect();
+
             ws.on(WebSocketShardEvents.Dispatch, ({ data }) => {
-                if (data.t === GatewayDispatchEvents.Ready) {
+                const { t } = data;
+
+                if (t === GatewayDispatchEvents.Ready) {
                     if (!this.status) {
                         this.status = true;
-                        Object.defineProperty(this, "user", { value: new ClientUser(data.d.user, this), configurable: true });
-                        Object.defineProperty(this, "id", { value: data.d.user.id, configurable: true });
-                        Object.defineProperty(this, "aplicationId", { value: data.d.application.id, configurable: true });
-
+                        this.user = new ClientUser(data.d.user, this);
+                        this.id = data.d.user.id;
+                        this.aplicationId = data.d.application.id;
                         ws.ready(data.d);
-                    };
+                    }
                 } else {
                     ws.Handler(data);
-                };
+                }
             });
+
             this.ws = ws;
         } catch {
             throw new HennusError(errorCodes.TokenInvalid);
-        };
+        }
+
         return token;
-    };
-};
+    }
+}

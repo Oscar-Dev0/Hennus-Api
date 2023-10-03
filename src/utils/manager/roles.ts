@@ -30,17 +30,19 @@ export class RolesManager extends cacheManager<Snowflake, GuildRoles>{
         return map as GuildRoles[];
     };
 
-    setall(roles: APIRole[]){
-        if(!this._maps && roles && Array.isArray(roles)){
+    setall(roles: APIRole[]) {
+        if (!this._maps && Array.isArray(roles)) {
             this._maps = true;
             
-            roles.forEach((role)=>{
-                const _role = new GuildRoles(role, this.client);
-                if(!this.resolve(role.id)) this.cache.set(role.id, _role);
+            roles.forEach((role) => {
+                if (!this.cache.has(role.id)) {
+                    const _role = new GuildRoles(role, this.client);
+                    this.cache.set(role.id, _role);
+                }
             });
-        };
+        }
         return this.cache;
-    };
+    }
 
     get color() {
         const coloredRoles = this.cache.filter(role => role.color);

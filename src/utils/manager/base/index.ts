@@ -4,9 +4,10 @@ import { Snowflake } from "discord-api-types/globals";
 
 
 export class cacheManager<T, V> {
-    private _cache = new Collection<T, V>();
-    constructor(public readonly client: Client){
+    private _cache: Collection<T, V>;
+    constructor(public readonly client: Client, iterable?: Iterable<readonly [T, V]> | null | undefined){
         Object.defineProperty(this, "client", {value: client});
+        this._cache = new Collection(iterable);
     };
 
     get rest(){

@@ -77,6 +77,7 @@ export class Guild extends BaseData {
 
         return this;
     };
+    
     toString() {
         if (this.id) return `<@&${this.id}>`;
         else return "";

@@ -3,11 +3,13 @@ import { cacheManager } from "./base";
 import { Client } from "../../core";
 import { GuildRoles } from "../../types";
 import { APIRole } from "discord-api-types/v10";
-import { HennusError } from "../../core/Error";
+import { Collection } from "@discordjs/collection";
 
 export class RolesManager extends cacheManager<Snowflake, GuildRoles>{
-    constructor(client: Client){
-        super(client);
+    constructor(client: Client, Iterable?: APIRole[]){
+        const roles = (Iterable??[]).map((role)=>new GuildRoles(role, this.client))
+        const map: Iterable<readonly [string, GuildRoles]> = roles.map((x) => [x.id, x] as readonly [string, GuildRoles]);
+        super(client, map);
     };
 
     private _maps = false;
@@ -30,16 +32,13 @@ export class RolesManager extends cacheManager<Snowflake, GuildRoles>{
         return map as GuildRoles[];
     };
 
-    setall(roles: APIRole[]) {
-        if (!this._maps && Array.isArray(roles)) {
+    setall(Iterable: APIRole[]) {
+        if (!this._maps && Array.isArray(Iterable)) {
             this._maps = true;
             
-            roles.forEach((role) => {
-                if (!this.cache.has(role.id)) {
-                    const _role = new GuildRoles(role, this.client);
-                    this.cache.set(role.id, _role);
-                }
-            });
+            const roles = (Iterable??[]).map((role)=>new GuildRoles(role, this.client))
+            const map: Iterable<readonly [string, GuildRoles]> = roles.map((x) => [x.id, x] as readonly [string, GuildRoles]);
+            this.cache.concat(new Collection(map));
         }
         return this.cache;
     }

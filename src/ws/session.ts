@@ -185,7 +185,7 @@ export class HennusWS extends WebSocketManager {
             };
 
             if(int) this.client.emit("InteractionCreate", int);
-        };
+        } else if(data.t == GatewayDispatchEvents.VoiceStateUpdate) this.client.emit("VoiceStateUpdate", data.d);
     };
 
     async ready(data: GatewayReadyDispatchData) {

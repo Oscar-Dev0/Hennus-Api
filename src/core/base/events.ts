@@ -1,3 +1,4 @@
+import { GatewayVoiceState } from "discord-api-types/v10";
 import { Channel, Guild, GuildMember, Interaction, Message, Ready, User } from "../../types";
 import { Presence } from "../../types/events/Presence";
 
@@ -51,7 +52,7 @@ export interface ListEvents {
     TypingStart : [],
     UserUpdate : [ user: User ],
     VoiceServerUpdate : [],
-    VoiceStateUpdate : [],
+    VoiceStateUpdate : [ voice: GatewayVoiceState ],
     WebhooksUpdate : [],
     GuildScheduledEventCreate : [],
     GuildScheduledEventUpdate : [],
